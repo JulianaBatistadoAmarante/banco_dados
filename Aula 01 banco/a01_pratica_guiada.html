@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prática Guiada — Modelagem no draw.io · Aula 01</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.pg-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.pg-title{font-size:17px;font-weight:600}.pg-meta{font-size:12px;color:#64748b;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pg-time{font-size:12px;font-weight:500;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 12px;border-radius:8px;color:#64748b}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#e3f2fd}
+.prog-row{display:flex;align-items:center;gap:9px}
+.pb{flex:1;height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.pf{height:100%;background:#1565C0;border-radius:4px;transition:width .4s ease;width:0%}
+.pt{font-size:12px;font-weight:600;color:#64748b;min-width:60px;text-align:right}
+.steps{display:flex;flex-direction:column;gap:8px}
+.sc{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;transition:border-color .2s}
+.sc.done-c{border-color:#86efac}.sc.open-c{border-color:#90caf9}
+.sh{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;cursor:pointer;user-select:none;transition:background .15s}
+.sh:hover{background:#f8fafc}.sc.open-c .sh{background:#e3f2fd}
+.chk{width:21px;height:21px;border-radius:6px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .18s;cursor:pointer;background:#fff}
+.chk:hover{border-color:#1565C0;background:#bbdefb}.chk.done{background:#22c55e;border-color:#22c55e}
+.chk svg{display:none}.chk.done svg{display:block}
+.si{flex:1}.sn2{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.st{font-size:13px;font-weight:600;color:#1e293b;line-height:1.3}.stm{font-size:11px;color:#94a3b8;margin-top:2px}
+.cv{color:#94a3b8;font-size:11px;margin-top:4px;transition:transform .22s;flex-shrink:0}
+.sc.open-c .cv{transform:rotate(180deg)}
+.sb{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.sc.open-c .sb{max-height:2400px}
+.sbi{padding:0 13px 14px;border-top:1px solid #f1f5f9}
+.il{display:flex;flex-direction:column;gap:6px;margin:11px 0}
+.ii{display:flex;gap:9px;font-size:13px;color:#475569;line-height:1.55;align-items:flex-start}
+.in{width:19px;height:19px;min-width:19px;border-radius:5px;background:#bbdefb;color:#1565C0;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.tip{background:#e3f2fd;border-left:3px solid #1565C0;padding:8px 12px;font-size:12px;color:#0d3c6e;line-height:1.5;margin-top:8px}
+.tip strong{color:#1565C0;font-weight:600}
+.mb{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;margin-top:10px}
+.mb:hover{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.mb.done-btn{background:#f0fdf4;color:#15803d;border-color:#86efac;pointer-events:none}
+.success-b{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center;display:none}
+.success-b.show{display:block}
+.success-b h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.success-b p{font-size:13px;color:#475569}
+.next-big{display:inline-flex;align-items:center;gap:7px;background:#1565C0;color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px;transition:background .15s}
+.next-big:hover{background:#0d47a1}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pg-header">
+    <div>
+      <div class="pg-title">Prática guiada — Modelagem no draw.io</div>
+      <div class="pg-meta">Siga os passos. Marque cada um ao terminar.</div>
+    </div>
+    <div class="header-right">
+      <span class="pg-time">90 min disponíveis</span>
+      <button class="next-stage" onclick="window.location.href='a01_desafio.html'">🎯 Desafio →</button>
+    </div>
+  </div>
+  <div class="prog-row"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt">0 / 6</div></div>
+  <div class="steps" id="steps"></div>
+  <div class="success-b" id="success-el">
+    <h3>Modelo da loja completo!</h3>
+    <p>Você modelou as 3 entidades com atributos, relacionamentos e cardinalidade nas duas notações.</p>
+    <button class="next-big" onclick="window.location.href='a01_desafio.html'">🎯 Ir para o Desafio →</button>
+  </div>
+</div>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+<script>
+const STEPS=[
+{title:"Abrir o draw.io e criar o arquivo",time:"5 min",
+instrs:[
+  "Acesse <strong>app.diagrams.net</strong> (draw.io) no navegador — sem cadastro necessário",
+  "Clique em <strong>Create New Diagram</strong> → escolha <strong>Blank</strong>",
+  "Nomeie o arquivo: <strong>modelo_loja_aula01</strong>",
+  "Escolha onde salvar: Google Drive (recomendado) ou Device (arquivo local)"
+],
+tip:"<strong>Lucidchart também funciona:</strong> acesse lucidchart.com → New Document → Blank. Use formas de 'Entity Relationship' no painel esquerdo. O resultado final deve ser idêntico."},
+{title:"Criar as 3 entidades com atributos",time:"20 min",
+instrs:[
+  "Crie a entidade <strong>CATEGORIA</strong> com atributos: <u>id_categoria</u> (sublinhe = PK), nome, descricao",
+  "Crie a entidade <strong>PRODUTO</strong> com atributos: <u>id_produto</u>, nome, preco, estoque",
+  "Crie a entidade <strong>CLIENTE</strong> com atributos: <u>id_cliente</u>, nome, email, telefone",
+  "Organize as 3 entidades em linha no canvas com espaço entre elas para os conectores"
+],
+tip:"<strong>No draw.io:</strong> arraste a forma 'Entity' do painel esquerdo. Clique duplo no nome para editar. Adicione linhas de atributo clicando em '+' dentro da entidade ou editando o XML diretamente."},
+{title:"Definir e justificar a cardinalidade",time:"15 min",
+instrs:[
+  "Para Categoria → Produto: responda — 'Quantos Produtos uma Categoria pode ter?' e 'A quantas Categorias um Produto pertence?'",
+  "Escreva no papel: Categoria (?) ─── Produto (?) — qual a cardinalidade?",
+  "Para Produto ↔ Cliente: 'Um Cliente pode comprar quantos Produtos?' e 'Um Produto pode ser comprado por quantos Clientes?'",
+  "Escreva a cardinalidade de cada relacionamento antes de desenhar no diagrama"
+],
+tip:"<strong>Resposta esperada:</strong> Categoria→Produto é 1:N (uma categoria tem muitos produtos, mas um produto pertence a uma só categoria). Produto↔Cliente é N:M (muitos para muitos — precisará de tabela associativa na implementação)."},
+{title:"Conectar com notação UML (números)",time:"15 min",
+instrs:[
+  "Conecte Categoria → Produto: arraste um conector entre as entidades",
+  "Clique na linha → adicione rótulo esquerdo <strong>1</strong>, rótulo direito <strong>*</strong>, rótulo central <strong>tem</strong>",
+  "Conecte Produto ↔ Cliente: rótulos <strong>*</strong> dos dois lados, verbo central <strong>compra</strong>",
+  "Verifique: leia o diagrama como frases — 'Uma Categoria <em>tem</em> muitos Produtos' faz sentido?"
+],
+tip:"<strong>No draw.io:</strong> clique duplo na linha para editar o rótulo central. Para rótulos das pontas, selecione a linha → no painel direito (Properties) edite 'Source Label' e 'Target Label'."},
+{title:"Duplicar e criar versão crow's foot",time:"20 min",
+instrs:[
+  "Selecione tudo (Ctrl+A) → Copie (Ctrl+C) → Cole abaixo (Ctrl+V)",
+  "No novo diagrama, selecione a linha Categoria→Produto → clique na ponta de Categoria → mude para <strong>ERD One</strong>",
+  "Na ponta de Produto → mude para <strong>ERD Many</strong> (pé de galho)",
+  "Repita para Produto↔Cliente: <strong>ERD Many</strong> nos dois lados"
+],
+tip:"<strong>Onde encontrar os símbolos crow's foot no draw.io:</strong> selecione a linha → clique na ponta (aparece seta) → no menu dropdown de forma da ponta, escolha 'ERDOne', 'ERDMany', 'ERDOneToMany', etc."},
+{title:"Exportar e salvar o modelo",time:"5 min",
+instrs:[
+  "Revise o diagrama: as 3 entidades, os 2 relacionamentos, cardinalidade nos dois formatos",
+  "Exporte como imagem: <strong>File → Export As → PNG</strong> — nomeie <strong>der_loja_aula01.png</strong>",
+  "Salve o arquivo fonte: <strong>File → Save</strong> (Ctrl+S) — formato .drawio ou .xml",
+  "Guarde o arquivo — será a base para a Aula 2 onde traduzimos o modelo para SQL"
+],
+tip:"<strong>O que entregar na Aula 2:</strong> o arquivo do draw.io com as entidades Categoria, Produto e Cliente nas notações UML e crow's foot, com cardinalidade correta em todos os relacionamentos."}
+];
+let done=new Set();
+function build(){const list=document.getElementById('steps');STEPS.forEach((s,i)=>{const card=document.createElement('div');card.className='sc'+(i===0?' open-c':'');card.id='sc-'+i;card.innerHTML=`<div class="sh" onclick="tog(${i})"><div class="chk" id="chk-${i}" onclick="event.stopPropagation();mk(${i})"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="si"><div class="sn2">Passo ${i+1} de ${STEPS.length}</div><div class="st">${s.title}</div><div class="stm">${s.time}</div></div><span class="cv">${i===0?'▲':'▼'}</span></div><div class="sb"><div class="sbi"><div class="il">${s.instrs.map((t,j)=>`<div class="ii"><div class="in">${j+1}</div><span>${t}</span></div>`).join('')}</div><div class="tip">${s.tip}</div><button class="mb" id="mb-${i}" onclick="mk(${i})"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Marcar como concluído</button></div></div>`;list.appendChild(card);});}
+function tog(i){const c=document.getElementById('sc-'+i);const o=c.classList.contains('open-c');document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').textContent='▼';});if(!o){c.classList.add('open-c');c.querySelector('.cv').textContent='▲';}}
+function mk(i){if(done.has(i))return;done.add(i);document.getElementById('chk-'+i).classList.add('done');document.getElementById('sc-'+i).classList.add('done-c');const mb=document.getElementById('mb-'+i);mb.classList.add('done-btn');mb.innerHTML='<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Concluído!';upd();if(i<STEPS.length-1){document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').textContent='▼';});const nx=document.getElementById('sc-'+(i+1));nx.classList.add('open-c');nx.querySelector('.cv').textContent='▲';setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'nearest'}),100);}if(done.size===STEPS.length)document.getElementById('success-el').classList.add('show');}
+function upd(){document.getElementById('pf').style.width=Math.round((done.size/STEPS.length)*100)+'%';document.getElementById('pt').textContent=done.size+' / '+STEPS.length;}
+build();upd();
+</script>
+</body>
+</html>

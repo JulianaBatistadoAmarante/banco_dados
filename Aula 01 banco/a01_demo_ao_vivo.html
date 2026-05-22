@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo ao Vivo — Modelagem no draw.io · Aula 01</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.full{grid-column:1/-1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.page-hdr h1{font-size:16px;font-weight:600}.page-hdr p{font-size:12px;color:#94a3b8}
+.prog-track{height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#1565C0;border-radius:2px;transition:width .3s;width:0%}
+.panel{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:500;color:#64748b}
+.preview{min-height:360px;padding:16px;overflow-y:auto;background:#fff;display:flex;align-items:center;justify-content:center}
+.narr{background:#e3f2fd;border:1px solid #90caf9;border-radius:10px;padding:11px 14px;font-size:13px;color:#0d3c6e;line-height:1.6;min-height:50px}
+.narr strong{color:#1565C0}
+.step-bar{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;background:#bbdefb;color:#1565C0}
+.slabel{font-size:12px;color:#64748b;flex:1}
+.cb2{font-size:12px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.cb2:hover{background:#f1f5f9}.cb2.go{background:#1565C0;color:#fff;border-color:#1565C0}.cb2.go:hover{background:#0d47a1}
+.instrs{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:7px}
+.instr-title{font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.instr-item{display:flex;gap:9px;font-size:13px;color:#475569;line-height:1.5;align-items:flex-start}
+.instr-n{width:19px;height:19px;min-width:19px;border-radius:5px;background:#bbdefb;color:#1565C0;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+.ent-box{border:2px solid #1565C0;min-width:120px;background:#fff;text-align:left}
+.ent-name{background:#1565C0;color:#fff;font-size:12px;font-weight:700;padding:5px 10px;text-align:center;text-transform:uppercase}
+.ent-attrs{padding:6px 10px;font-size:11px;color:#475569;line-height:2;font-family:monospace}
+.ent-pk{color:#f59e0b;font-weight:700}
+.ent-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.rel-block{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:70px}
+.rel-verb{font-size:10px;font-weight:600;color:#1565C0;background:#bbdefb;padding:2px 6px;border-radius:7px}
+.rel-card{font-size:11px;font-weight:700;color:#94a3b8}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#e3f2fd}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="full page-hdr">
+    <h1>Demo ao Vivo — Modelagem no draw.io</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <p>Aula 01 · 30 min · Docente modela, turma acompanha e replica</p>
+      <button class="next-stage" onclick="window.location.href='a01_pratica_guiada.html'">📝 Prática →</button>
+    </div>
+  </div>
+  <div class="full prog-track"><div class="prog-fill" id="prog"></div></div>
+  <div class="panel">
+    <div class="ph"><span id="ph-label">Passo a passo no draw.io</span></div>
+    <div class="instrs" id="instrs" style="margin:12px;border-radius:10px"></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span>Resultado esperado</span></div>
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="full narr" id="narr">Pronto. Clique em <strong>Próxima etapa</strong> para começar.</div>
+  <div class="full step-bar">
+    <span class="sbadge" id="sbadge">Etapa 1 / 6</span>
+    <span class="slabel" id="sdesc">Abrir o draw.io e criar o diagrama</span>
+    <button class="cb2" id="bp" onclick="prevS()" disabled>← Anterior</button>
+    <button class="cb2 go" id="bn" onclick="nextS()">Próxima etapa →</button>
+  </div>
+</div>
+<script>
+const STEPS=[
+{label:"Abrir o draw.io e criar o diagrama",
+narr:"<strong>Docente:</strong> \"Acessem draw.io ou app.diagrams.net pelo navegador — sem cadastro. Criem um novo diagrama em branco. Vamos usar esse ambiente para modelar as entidades da loja nas duas notações: UML e crow's foot.\"",
+instrs:["Acesse <strong>draw.io</strong> (app.diagrams.net) no navegador","Clique em <strong>Create New Diagram</strong> → escolha <strong>Blank</strong>","Nomeie o arquivo: <strong>modelo_loja_aula01</strong>","Salve no Google Drive ou faça o download ao final da aula"],
+prev:`<div style="text-align:center;padding:20px"><div style="background:#e3f2fd;border:2px dashed #90caf9;border-radius:12px;padding:24px;max-width:260px;margin:0 auto"><div style="font-size:32px;margin-bottom:10px">🗺️</div><p style="font-size:13px;color:#1565C0;font-weight:600">draw.io pronto</p><p style="font-size:12px;color:#64748b;margin-top:4px">Diagrama em branco criado</p></div></div>`},
+{label:"Criar a entidade Categoria (UML)",
+narr:"<strong>Docente:</strong> \"Criamos a primeira entidade. No draw.io, arrastem uma forma de classe UML para a tela. Nomeiem como CATEGORIA. Adicionem os atributos: id_categoria (sublinhado = PK), nome e descricao.\"",
+instrs:["No painel esquerdo, procure <strong>Entity</strong> ou use uma caixa com duas seções","Arraste para a tela e nomeie: <strong>CATEGORIA</strong>","Adicione os atributos: <strong><u>id_categoria</u></strong>, nome, descricao","Sublinhe id_categoria — indica chave primária na notação clássica"],
+prev:`<div style="display:flex;justify-content:center;padding:16px"><div class="ent-box"><div class="ent-name">Categoria</div><div class="ent-attrs"><span style="text-decoration:underline">id_categoria</span><br>nome<br>descricao</div></div></div>`},
+{label:"Criar as entidades Produto e Cliente",
+narr:"<strong>Docente:</strong> \"Criamos mais duas entidades. Produto com id_produto, nome, preco e estoque. Cliente com id_cliente, nome, email e telefone. Coloquem lado a lado para ter espaço para os conectores.\"",
+instrs:["Crie a entidade <strong>PRODUTO</strong>: <u>id_produto</u>, nome, preco, estoque","Crie a entidade <strong>CLIENTE</strong>: <u>id_cliente</u>, nome, email, telefone","Organize no canvas: Categoria — Produto — Cliente da esquerda para direita","Deixe espaço entre as caixas para os conectores"],
+prev:`<div class="ent-row" style="padding:12px"><div class="ent-box"><div class="ent-name">Categoria</div><div class="ent-attrs"><span style="text-decoration:underline">id_categoria</span><br>nome<br>descricao</div></div><div class="ent-box"><div class="ent-name">Produto</div><div class="ent-attrs"><span style="text-decoration:underline">id_produto</span><br>nome<br>preco<br>estoque</div></div><div class="ent-box"><div class="ent-name">Cliente</div><div class="ent-attrs"><span style="text-decoration:underline">id_cliente</span><br>nome<br>email<br>telefone</div></div></div>`},
+{label:"Conectar com notação UML (números)",
+narr:"<strong>Docente:</strong> \"Conectamos as entidades com linhas e adicionamos a cardinalidade. UML usa números: '1' do lado de Categoria e '*' do lado de Produto. No draw.io, clique na linha e edite os rótulos das pontas.\"",
+instrs:["Arraste um conector de <strong>Categoria → Produto</strong>","Clique na linha → adicione rótulo de ponta esquerda: <strong>1</strong>","Adicione rótulo de ponta direita: <strong>*</strong>","Adicione rótulo central com o verbo: <strong>tem</strong>"],
+prev:`<div class="ent-row" style="padding:12px;gap:0"><div class="ent-box"><div class="ent-name">Categoria</div><div class="ent-attrs"><span style="text-decoration:underline">id_categoria</span><br>nome</div></div><div class="rel-block"><div class="rel-card">1</div><div style="width:60px;height:2px;background:#94a3b8;margin:3px 0"></div><div class="rel-card">*</div></div><div class="ent-box"><div class="ent-name">Produto</div><div class="ent-attrs"><span style="text-decoration:underline">id_produto</span><br>nome</div></div></div><p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:6px">Notação UML: 1 e * nas pontas</p>`},
+{label:"Duplicar e criar versão crow's foot",
+narr:"<strong>Docente:</strong> \"Vamos fazer o mesmo diagrama abaixo usando crow's foot. Selecione tudo (Ctrl+A) e copie (Ctrl+C), cole abaixo. Mude os conectores para usar os símbolos visuais: barra perto de Categoria, pé de galho perto de Produto.\"",
+instrs:["Selecione todas as entidades (Ctrl+A) e copie (Ctrl+C)","Cole (Ctrl+V) e posicione abaixo do diagrama UML","Nas linhas do novo diagrama: clique na ponta de <strong>Categoria</strong> → escolha símbolo <strong>ERD One</strong>","Na ponta de <strong>Produto</strong> → escolha símbolo <strong>ERD Many</strong>"],
+prev:`<div style="display:flex;flex-direction:column;gap:16px;padding:12px"><div style="font-size:10px;color:#94a3b8;font-weight:600">UML — números</div><div class="ent-row" style="gap:0"><div class="ent-box"><div class="ent-name" style="font-size:10px">Categoria</div><div class="ent-attrs"><span style="text-decoration:underline;font-size:10px">id</span></div></div><div class="rel-block"><div class="rel-card">1</div><div style="width:50px;height:2px;background:#94a3b8;margin:2px 0"></div><div class="rel-card">*</div></div><div class="ent-box"><div class="ent-name" style="font-size:10px">Produto</div><div class="ent-attrs"><span style="text-decoration:underline;font-size:10px">id</span></div></div></div><div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:4px">Crow's foot — símbolos</div><svg viewBox="0 0 260 50" style="width:260px;max-width:100%"><rect x="0" y="11" width="80" height="28" fill="#1565C0" rx="2"/><text x="40" y="29" font-size="10" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">CATEGORIA</text><line x1="80" y1="25" x2="170" y2="25" stroke="#1565C0" stroke-width="2"/><line x1="88" y1="17" x2="88" y2="33" stroke="#1565C0" stroke-width="2"/><line x1="160" y1="15" x2="172" y2="25" stroke="#1565C0" stroke-width="2"/><line x1="160" y1="35" x2="172" y2="25" stroke="#1565C0" stroke-width="2"/><line x1="160" y1="25" x2="172" y2="25" stroke="#1565C0" stroke-width="2"/><rect x="172" y="11" width="80" height="28" fill="#1565C0" rx="2"/><text x="212" y="29" font-size="10" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">PRODUTO</text><text x="86" y="10" font-size="9" fill="#94a3b8" font-family="system-ui">1</text><text x="158" y="10" font-size="9" fill="#94a3b8" font-family="system-ui">N</text></svg></div>`},
+{label:"Modelo completo — UML + crow's foot",
+narr:"<strong>Docente:</strong> \"O modelo final deve ter as 3 entidades com os 2 relacionamentos em ambas as notações. Salve o arquivo. Na aula 2 vamos pegar esse modelo e traduzi-lo para SQL no Workbench, criando as tabelas com PKs e FKs.\"",
+instrs:["Verifique se os dois relacionamentos estão corretos: Categoria→Produto (1:N) e Produto↔Cliente (N:M via pedidos — ainda não precisa da associativa)","Salve o arquivo: <strong>File → Save As</strong> (Google Drive ou .xml)","Exporte como imagem: <strong>File → Export As → PNG</strong>","Guarde o arquivo — será usado na Aula 2"],
+prev:`<div style="padding:12px"><div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Modelo completo — banco loja (3 entidades)</div><div class="ent-row" style="gap:8px"><div class="ent-box"><div class="ent-name">Categoria</div><div class="ent-attrs"><span class="ent-pk">🔑 id_categoria</span><br>nome<br>descricao</div></div><div class="rel-block"><div class="rel-verb">tem</div><div style="font-size:10px;font-weight:700;color:#1565C0">1 : N</div><div style="width:50px;height:2px;background:#94a3b8"></div></div><div class="ent-box"><div class="ent-name">Produto</div><div class="ent-attrs"><span class="ent-pk">🔑 id_produto</span><br>nome<br>preco<br>estoque</div></div></div><div style="margin-top:12px;text-align:center"><div class="rel-block" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px"><div class="rel-verb">compra</div><div style="font-size:10px;font-weight:700;color:#1565C0">N : M</div><div style="width:2px;height:24px;background:#94a3b8"></div></div></div><div class="ent-row" style="gap:8px;margin-top:4px"><div class="ent-box"><div class="ent-name">Cliente</div><div class="ent-attrs"><span class="ent-pk">🔑 id_cliente</span><br>nome<br>email<br>telefone</div></div></div><div style="background:#e3f2fd;border-left:3px solid #1565C0;padding:9px 11px;font-size:12px;color:#0d3c6e;margin-top:12px;border-radius:0 6px 6px 0"><strong>Pronto para a Aula 2:</strong> traduzir este modelo para SQL no Workbench!</div></div>`}
+];
+let cur=0;
+function render(){const s=STEPS[cur];document.getElementById('sbadge').textContent='Etapa '+(cur+1)+' / '+STEPS.length;document.getElementById('sdesc').textContent=s.label;document.getElementById('prog').style.width=Math.round(((cur+1)/STEPS.length)*100)+'%';document.getElementById('bp').disabled=cur===0;document.getElementById('narr').innerHTML=s.narr;document.getElementById('preview').innerHTML=s.prev;const il=document.getElementById('instrs');il.innerHTML='<div class="instr-title">Passos no draw.io</div>'+s.instrs.map((t,i)=>'<div class="instr-item"><div class="instr-n">'+(i+1)+'</div><span>'+t+'</span></div>').join('');}
+function nextS(){cur=Math.min(cur+1,STEPS.length-1);render();}
+function prevS(){cur=Math.max(cur-1,0);render();}
+render();
+</script>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+</body>
+</html>

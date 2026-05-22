@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio — Modelagem Autônoma · Aula 01</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.brief{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.bt{background:#bbdefb;padding:17px 19px;border-bottom:1px solid #90caf9}
+.bbadge{font-size:11px;font-weight:600;background:#fff;color:#1565C0;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px}
+.btitle{font-size:19px;font-weight:600;color:#0d3c6e;margin-bottom:3px}
+.bsub{font-size:13px;color:#1565C0}
+.bb{padding:15px 19px}
+.ctx{background:#e3f2fd;border-radius:8px;padding:11px 13px;font-size:13px;color:#475569;line-height:1.6;margin-bottom:13px;border-left:3px solid #1565C0}
+.ctx strong{color:#1e293b;font-weight:600;display:block;margin-bottom:3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+.colt{font-size:11px;font-weight:600;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
+.rl{display:flex;flex-direction:column;gap:5px}
+.ri{display:flex;gap:9px;align-items:flex-start}
+.rc{width:19px;height:19px;min-width:19px;border-radius:5px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;transition:all .15s;background:#fff}
+.rc:hover{border-color:#1565C0;background:#bbdefb}.rc.on{background:#22c55e;border-color:#22c55e}
+.rc svg{display:none}.rc.on svg{display:block}
+.rt{font-size:12.5px;color:#475569;line-height:1.5}
+.rt.done{color:#94a3b8;text-decoration:line-through}
+.cl{display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:flex-start;gap:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;color:#475569;line-height:1.5}
+.cd{width:5px;height:5px;min-width:5px;border-radius:50%;background:#1565C0;flex-shrink:0;margin-top:5px}
+.pw{border:1px solid #e2e8f0;border-radius:12px;padding:13px 15px;background:#fff}
+.pl{font-size:12px;color:#64748b;margin-bottom:7px;display:flex;justify-content:space-between}
+.pl strong{color:#1e293b;font-weight:600}
+.pb{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:9px}
+.pf{height:100%;background:#1565C0;border-radius:4px;transition:width .4s ease;width:0%}
+.pm{font-size:12px;color:#64748b;font-style:italic}
+.tr{display:flex;align-items:center;gap:9px;border:1px solid #e2e8f0;border-radius:12px;padding:11px 15px;background:#fff;flex-wrap:wrap}
+.tn{font-size:26px;font-weight:500;font-family:'Courier New',monospace;color:#1e293b;min-width:80px}
+.ti{flex:1;min-width:130px}.ti p{font-size:12px;color:#64748b;margin-top:1px}
+.ti strong{font-size:13px;color:#1e293b;font-weight:600}
+.tb{font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #cbd5e1;background:#1565C0;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.tb:hover{background:#0d47a1}.tb.reset{background:#fff;color:#64748b;border-color:#cbd5e1}.tb:disabled{opacity:.4;pointer-events:none}
+.ent{border:1px solid #86efac;border-radius:12px;padding:13px 15px;background:#f0fdf4}
+.et{font-size:11px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.ep{font-size:13px;color:#475569;line-height:1.6}
+.sb2{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center}
+.sb2.show{display:block}
+.sb2 h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.sb2 p{font-size:13px;color:#475569}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#1565C0;border:1.5px solid #1565C0;color:#fff;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#0d47a1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brief">
+    <div class="bt">
+      <div class="bbadge">Desafio autônomo · 45 minutos</div>
+      <div class="btitle">Modelagem do Banco da Loja — DER Completo</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="bsub">Entidades, atributos, relacionamentos e cardinalidade. Sem copiar do colega.</div>
+        <button class="next-stage" onclick="window.location.href='a01_feedback.html'">📋 Feedback →</button>
+      </div>
+    </div>
+    <div class="bb">
+      <div class="ctx"><strong>Contexto</strong>Usando o draw.io ou Lucidchart, crie o DER do banco da loja sozinho, a partir das especificações abaixo. O modelo gerado será a base para a Aula 2, onde você o traduzirá para SQL no Workbench.</div>
+      <div class="two">
+        <div><div class="colt">Requisitos — marque conforme conclui</div><div class="rl" id="req-list"></div></div>
+        <div><div class="colt">Critérios de avaliação</div>
+          <div class="cl">
+            <div class="ci"><div class="cd"></div>3 entidades presentes com nomes corretos</div>
+            <div class="ci"><div class="cd"></div>Chave primária identificada em cada entidade (sublinhado ou 🔑)</div>
+            <div class="ci"><div class="cd"></div>Atributos relevantes em cada entidade</div>
+            <div class="ci"><div class="cd"></div>Relacionamentos com verbo descritivo</div>
+            <div class="ci"><div class="cd"></div>Cardinalidade correta em notação UML</div>
+            <div class="ci"><div class="cd"></div>Cardinalidade correta em notação crow's foot</div>
+            <div class="ci" style="border-color:#86efac;background:#f0fdf4"><div class="cd" style="background:#22c55e"></div>Bônus: adicionar entidade Pedido e justificar por que vira N:M com Produto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pw">
+    <div class="pl"><strong>Progresso do desafio</strong><span id="ptxt">0 de 8 concluídos</span></div>
+    <div class="pb"><div class="pf" id="pfg"></div></div>
+    <div class="pm" id="pmsg">Comece criando as 3 entidades no draw.io.</div>
+  </div>
+  <div class="tr">
+    <div class="tn" id="tnum">45:00</div>
+    <div class="ti"><strong>Cronômetro do desafio</strong><p id="tmsg">Inicie quando o docente autorizar</p></div>
+    <button class="tb" id="tbtn" onclick="timerClick()">Iniciar</button>
+    <button class="tb reset" onclick="timerReset()">Zerar</button>
+  </div>
+  <div class="ent">
+    <div class="et">Entrega</div>
+    <div class="ep">Arquivo exportado como <strong>der_loja_desafio_aula01.png</strong> + arquivo fonte (.drawio ou .xml). Mostre ao docente no Workbench na Aula 2. O diagrama deve ter as duas notações (UML e crow's foot) claramente identificadas.</div>
+  </div>
+  <div class="sb2" id="success"><h3>Desafio concluído!</h3><p>DER do banco loja modelado com as duas notações. Guarde o arquivo — ele é a base da Aula 2!</p></div>
+</div>
+<script>
+const REQS=[
+  {t:"Criar entidade <strong>CATEGORIA</strong> com: id_categoria (PK sublinhada), nome, descricao"},
+  {t:"Criar entidade <strong>PRODUTO</strong> com: id_produto (PK), nome, preco, estoque"},
+  {t:"Criar entidade <strong>CLIENTE</strong> com: id_cliente (PK), nome, email, telefone"},
+  {t:"Conectar Categoria → Produto com verbo (ex: 'tem') e cardinalidade <strong>1:N</strong> em notação UML (números 1 e *)"},
+  {t:"Conectar Produto ↔ Cliente com verbo (ex: 'compra') e cardinalidade <strong>N:M</strong> em notação UML (* e *)"},
+  {t:"Duplicar o diagrama e recriar com notação <strong>crow's foot</strong>: barra para '1', pé de galho para 'N'"},
+  {t:"Exportar como PNG e salvar o arquivo fonte (.drawio ou .xml)"},
+  {t:"Bônus: adicionar entidade <strong>PEDIDO</strong> e explicar (comentário no diagrama) por que Pedido↔Produto é N:M e precisará de tabela associativa"},
+];
+const MSGS=["Crie as 3 entidades com atributos.","Entidades criadas! Agora defina a cardinalidade no papel.","Conecte Categoria→Produto com UML.","Conecte Produto↔Cliente.","Duplique e recrie com crow's foot.","Crow's foot aplicado — exporte o arquivo.","Exportado! Bônus: adicione Pedido.","Tudo feito — guarde o arquivo para a Aula 2!"];
+let done=new Set(),ticking=false,tSec=45*60,tInterval=null;
+function buildReqs(){const el=document.getElementById('req-list');REQS.forEach((r,i)=>{const d=document.createElement('div');d.className='ri';d.style.cssText='display:flex;gap:9px;align-items:flex-start;margin-bottom:5px';d.innerHTML=`<div class="rc" id="rc-${i}" onclick="chk(${i})"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="rt" id="rt-${i}">${r.t}</div>`;el.appendChild(d);});}
+function chk(i){if(done.has(i)){done.delete(i);document.getElementById('rc-'+i).classList.remove('on');document.getElementById('rt-'+i).classList.remove('done');}else{done.add(i);document.getElementById('rc-'+i).classList.add('on');document.getElementById('rt-'+i).classList.add('done');}const n=done.size;document.getElementById('pfg').style.width=Math.round((n/REQS.length)*100)+'%';document.getElementById('ptxt').textContent=n+' de '+REQS.length+' concluídos';document.getElementById('pmsg').textContent=MSGS[Math.min(n,MSGS.length-1)];if(n===REQS.length)document.getElementById('success').classList.add('show');else document.getElementById('success').classList.remove('show');}
+function timerClick(){if(!ticking){ticking=true;document.getElementById('tbtn').textContent='Pausar';document.getElementById('tbtn').style.background='#475569';document.getElementById('tmsg').textContent='Cronômetro em andamento';tInterval=setInterval(()=>{tSec--;if(tSec<=0){tSec=0;clearInterval(tInterval);ticking=false;document.getElementById('tbtn').textContent='Encerrado';document.getElementById('tbtn').disabled=true;}const m=Math.floor(tSec/60),s=tSec%60;document.getElementById('tnum').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(tSec===1350)document.getElementById('tmsg').textContent='Metade do tempo — verifique a cardinalidade!';if(tSec===600)document.getElementById('tmsg').textContent='10 min restantes — finalize o crow\'s foot!';if(tSec===120)document.getElementById('tmsg').textContent='2 min — exporte o arquivo e finalize!';},1000);}else{ticking=false;clearInterval(tInterval);document.getElementById('tbtn').textContent='Continuar';document.getElementById('tbtn').style.background='#1565C0';document.getElementById('tmsg').textContent='Pausado';}}
+function timerReset(){clearInterval(tInterval);ticking=false;tSec=45*60;document.getElementById('tnum').textContent='45:00';document.getElementById('tbtn').textContent='Iniciar';document.getElementById('tbtn').style.background='#1565C0';document.getElementById('tbtn').disabled=false;document.getElementById('tmsg').textContent='Inicie quando o docente autorizar';}
+buildReqs();
+</script>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+</body>
+</html>
