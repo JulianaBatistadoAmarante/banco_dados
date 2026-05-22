@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio — Expandindo o Banco · Aula 02</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.brief{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.bt{background:#bbdefb;padding:17px 19px;border-bottom:1px solid #90caf9}
+.bbadge{font-size:11px;font-weight:600;background:#fff;color:#1565C0;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px}
+.btitle{font-size:19px;font-weight:600;color:#0d3c6e;margin-bottom:3px}
+.bsub{font-size:13px;color:#1565C0}
+.bb{padding:15px 19px}
+.ctx{background:#e3f2fd;border-radius:8px;padding:11px 13px;font-size:13px;color:#475569;line-height:1.6;margin-bottom:13px;border-left:3px solid #1565C0}
+.ctx strong{color:#1e293b;font-weight:600;display:block;margin-bottom:3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+.colt{font-size:11px;font-weight:600;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
+.rl{display:flex;flex-direction:column;gap:5px}
+.ri2{display:flex;gap:9px;align-items:flex-start;margin-bottom:4px}
+.rc{width:19px;height:19px;min-width:19px;border-radius:5px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;transition:all .15s;background:#fff;flex-shrink:0}
+.rc:hover{border-color:#1565C0;background:#bbdefb}.rc.on{background:#22c55e;border-color:#22c55e}
+.rc svg{display:none}.rc.on svg{display:block}
+.rt{font-size:12.5px;color:#475569;line-height:1.5}
+.rt.done{color:#94a3b8;text-decoration:line-through}
+.cl{display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:flex-start;gap:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;color:#475569;line-height:1.5}
+.cd{width:5px;height:5px;min-width:5px;border-radius:50%;background:#1565C0;flex-shrink:0;margin-top:5px}
+.pw{border:1px solid #e2e8f0;border-radius:12px;padding:13px 15px;background:#fff}
+.pl{font-size:12px;color:#64748b;margin-bottom:7px;display:flex;justify-content:space-between}
+.pl strong{color:#1e293b;font-weight:600}
+.pbarw{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:9px}
+.pf{height:100%;background:#1565C0;border-radius:4px;transition:width .4s ease;width:0%}
+.pm{font-size:12px;color:#64748b;font-style:italic}
+.tr{display:flex;align-items:center;gap:9px;border:1px solid #e2e8f0;border-radius:12px;padding:11px 15px;background:#fff;flex-wrap:wrap}
+.tn{font-size:26px;font-weight:500;font-family:'Courier New',monospace;color:#1e293b;min-width:80px}
+.ti{flex:1;min-width:130px}.ti p{font-size:12px;color:#64748b;margin-top:1px}
+.ti strong{font-size:13px;color:#1e293b;font-weight:600}
+.tb{font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #cbd5e1;background:#1565C0;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.tb:hover{background:#0d47a1}.tb.reset{background:#fff;color:#64748b;border-color:#cbd5e1}.tb:disabled{opacity:.4;pointer-events:none}
+.cw{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.ch2{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:7px 12px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cdd{display:flex;gap:4px}.c1{width:9px;height:9px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:12px 15px;font-size:11.5px;line-height:1.8;overflow-x:auto;font-family:'Courier New',monospace;white-space:pre;margin:0}
+.k{color:#93c5fd}.p{color:#c4b5fd}.v{color:#6ee7b7}.s{color:#fda4af}.c{color:#475569;font-style:italic}
+.ent{border:1px solid #86efac;border-radius:12px;padding:13px 15px;background:#f0fdf4}
+.et{font-size:11px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.ep{font-size:13px;color:#475569;line-height:1.6}
+.sb2{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center}
+.sb2.show{display:block}
+.sb2 h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.sb2 p{font-size:13px;color:#475569}
+.next-stage{font-size:12px;font-weight:600;background:#1565C0;border:1.5px solid #1565C0;color:#fff;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;margin-top:12px}
+.next-stage:hover{background:#0d47a1}
+.bonus{border:1px dashed #f59e0b;border-radius:10px;padding:12px 14px;background:#fffbeb;margin-top:10px}
+.bonus-t{font-size:11px;font-weight:600;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brief">
+    <div class="bt">
+      <div class="bbadge">Desafio autônomo · 45 minutos</div>
+      <div class="btitle">Expandir o banco — nova tabela e ALTER TABLE</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="bsub">Tabela funcionario + atualizar produto + novos dados + EER atualizado.</div>
+        <a href="a02_feedback.html" style="font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap">📋 Feedback →</a>
+      </div>
+    </div>
+    <div class="bb">
+      <div class="ctx"><strong>Contexto</strong>O banco loja que você criou na prática precisa crescer. O gestor pediu: (1) registrar funcionários com seus departamentos; (2) adicionar uma coluna de descrição nos produtos; (3) atualizar os dados e gerar o novo EER.</div>
+      <div class="two">
+        <div><div class="colt">Requisitos — marque conforme conclui</div><div class="rl" id="req-list"></div></div>
+        <div>
+          <div class="colt">Critérios de avaliação</div>
+          <div class="cl">
+            <div class="ci"><div class="cd"></div>Tabela funcionario criada com PK e FK para departamento</div>
+            <div class="ci"><div class="cd"></div>ALTER TABLE produto executado sem erro</div>
+            <div class="ci"><div class="cd"></div>Dados inseridos respeitando a ordem FK</div>
+            <div class="ci"><div class="cd"></div>EER atualizado mostrando todas as FKs</div>
+            <div class="ci"><div class="cd"></div>SELECT com WHERE e ORDER BY aplicados</div>
+            <div class="ci" style="border-color:#f59e0b;background:#fffbeb"><div class="cd" style="background:#f59e0b"></div>Bônus: SELECT filtrando funcionarios por departamento com nome da tabela pai usando subquery</div>
+          </div>
+          <div class="bonus">
+            <div class="bonus-t">📜 Referência rápida — ALTER TABLE</div>
+            <div class="cw" style="margin-top:6px">
+              <div class="ch2"><span>SQL</span><div class="cdd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+              <pre><span class="c">-- Adicionar coluna a tabela existente</span>
+<span class="k">ALTER TABLE</span> produto
+  <span class="k">ADD COLUMN</span> descricao <span class="p">VARCHAR</span>(<span class="s">255</span>);
+
+<span class="c">-- Adicionar FK a tabela existente</span>
+<span class="k">ALTER TABLE</span> produto
+  <span class="k">ADD COLUMN</span> id_categoria <span class="p">INT</span>,
+  <span class="k">ADD FOREIGN KEY</span> (id_categoria)
+    <span class="v">REFERENCES</span> categoria(id_categoria);</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pw">
+    <div class="pl"><strong>Progresso do desafio</strong><span id="ptxt">0 de 8 concluídos</span></div>
+    <div class="pbarw"><div class="pf" id="pfg"></div></div>
+    <div class="pm" id="pmsg">Comece criando a tabela departamento no Workbench.</div>
+  </div>
+  <div class="tr">
+    <div class="tn" id="tnum">45:00</div>
+    <div class="ti"><strong>Cronômetro do desafio</strong><p id="tmsg">Inicie quando o docente autorizar</p></div>
+    <button class="tb" id="tbtn" onclick="timerClick()">Iniciar</button>
+    <button class="tb reset" onclick="timerReset()">Zerar</button>
+  </div>
+  <div class="ent">
+    <div class="et">Entrega</div>
+    <div class="ep">Execute no Workbench: <strong>SELECT * FROM funcionario;</strong> e <strong>SELECT * FROM produto;</strong> e mostre os resultados ao docente. Gere o EER atualizado via <strong>Database → Reverse Engineer</strong> — deve mostrar as novas FKs.</div>
+  </div>
+  <div class="sb2" id="success"><h3>Desafio concluído!</h3><p>Banco expandido com sucesso. Você usou CREATE TABLE, ALTER TABLE, INSERT e SELECT — o ciclo completo do DER ao SQL.</p></div>
+</div>
+<script>
+const REQS=[
+  {t:"Criar tabela <strong>departamento</strong> com: id_departamento (PK AUTO_INCREMENT), nome VARCHAR(80) NOT NULL"},
+  {t:"Criar tabela <strong>funcionario</strong> com: id_funcionario (PK), id_departamento (FK → departamento), nome, cargo VARCHAR(60), salario DECIMAL(10,2)"},
+  {t:"Executar <strong>ALTER TABLE produto ADD COLUMN descricao VARCHAR(255)</strong> para adicionar coluna à tabela existente"},
+  {t:"Inserir ao menos 2 departamentos (ex: 'Vendas', 'Estoque') na tabela departamento"},
+  {t:"Inserir ao menos 3 funcionários referenciando os IDs de departamento corretos"},
+  {t:"Atualizar a descricao de ao menos 2 produtos com <strong>UPDATE produto SET descricao = '...' WHERE id_produto = ?</strong>"},
+  {t:"Executar SELECT com WHERE filtrando funcionários de um departamento específico"},
+  {t:"Gerar o EER atualizado via <strong>Database → Reverse Engineer</strong> e verificar que as novas FKs aparecem no diagrama"},
+];
+const MSGS=[
+  "Crie a tabela departamento primeiro (pai da FK de funcionario).",
+  "Departamento criado! Agora crie a tabela funcionario com FK.",
+  "Funcionario criado! Agora adicione a coluna descricao em produto com ALTER TABLE.",
+  "ALTER TABLE executado! Insira os departamentos.",
+  "Departamentos inseridos! Insira os funcionários.",
+  "Funcionários inseridos! Atualize a descrição dos produtos.",
+  "UPDATE feito! Execute um SELECT com WHERE.",
+  "Tudo concluído — gere o EER e mostre ao docente!"
+];
+let done=new Set(),ticking=false,tSec=45*60,tInterval=null;
+function buildReqs(){const el=document.getElementById('req-list');REQS.forEach((r,i)=>{const d=document.createElement('div');d.className='ri2';d.innerHTML=`<div class="rc" id="rc-${i}" onclick="chk(${i})"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="rt" id="rt-${i}">${r.t}</div>`;el.appendChild(d);});}
+function chk(i){if(done.has(i)){done.delete(i);document.getElementById('rc-'+i).classList.remove('on');document.getElementById('rt-'+i).classList.remove('done');}else{done.add(i);document.getElementById('rc-'+i).classList.add('on');document.getElementById('rt-'+i).classList.add('done');}const n=done.size;document.getElementById('pfg').style.width=Math.round((n/REQS.length)*100)+'%';document.getElementById('ptxt').textContent=n+' de '+REQS.length+' concluídos';document.getElementById('pmsg').textContent=MSGS[Math.min(n,MSGS.length-1)];if(n===REQS.length)document.getElementById('success').classList.add('show');else document.getElementById('success').classList.remove('show');}
+function timerClick(){if(!ticking){ticking=true;document.getElementById('tbtn').textContent='Pausar';document.getElementById('tbtn').style.background='#475569';document.getElementById('tmsg').textContent='Cronômetro em andamento';tInterval=setInterval(()=>{tSec--;if(tSec<=0){tSec=0;clearInterval(tInterval);ticking=false;document.getElementById('tbtn').textContent='Encerrado';document.getElementById('tbtn').disabled=true;}const m=Math.floor(tSec/60),s=tSec%60;document.getElementById('tnum').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(tSec===1350)document.getElementById('tmsg').textContent='Metade do tempo — FK de funcionario criada?';if(tSec===600)document.getElementById('tmsg').textContent='10 min restantes — finalize o EER!';if(tSec===120)document.getElementById('tmsg').textContent='2 min — mostre os SELECTs ao docente!';},1000);}else{ticking=false;clearInterval(tInterval);document.getElementById('tbtn').textContent='Continuar';document.getElementById('tbtn').style.background='#1565C0';document.getElementById('tmsg').textContent='Pausado';}}
+function timerReset(){clearInterval(tInterval);ticking=false;tSec=45*60;document.getElementById('tnum').textContent='45:00';document.getElementById('tbtn').textContent='Iniciar';document.getElementById('tbtn').style.background='#1565C0';document.getElementById('tbtn').disabled=false;document.getElementById('tmsg').textContent='Inicie quando o docente autorizar';}
+buildReqs();
+</script>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+</body>
+</html>

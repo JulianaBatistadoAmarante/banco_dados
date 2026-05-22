@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exposição — Do DER ao SQL · Aula 02</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;gap:8px;flex-wrap:wrap;min-height:52px}
+.badge{background:#1565C0;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.hdr-title{font-size:14px;font-weight:600}
+.hdr-sub{font-size:12px;color:#94a3b8;margin-top:1px}
+.timer{font-size:13px;font-weight:500;background:#f1f5f9;padding:5px 14px;border-radius:8px;border:1px solid #e2e8f0;font-family:monospace;color:#475569;min-width:64px;text-align:center}
+.timer.warn{color:#d97706;background:#fffbeb}.timer.danger{color:#dc2626;background:#fef2f2}
+.dots{display:flex;align-items:center;gap:5px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;overflow-x:auto}
+.dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;cursor:pointer;transition:all .2s;flex-shrink:0}
+.dot.active{background:#1565C0;transform:scale(1.4)}.dot.done{background:#1976D2;opacity:.5}
+.dsep{width:10px;height:1px;background:#e2e8f0;flex-shrink:0}
+.slide-area{flex:1;overflow-y:auto;padding:22px 28px}
+.slide{display:none}.slide.active{display:block;animation:sIn .22s ease}
+@keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ey{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#1565C0;margin-bottom:5px}
+.stitle{font-size:21px;font-weight:600;color:#1e293b;line-height:1.2;margin-bottom:5px}
+.ssub{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px}
+.card.ac{border-left:3px solid #1565C0}
+.ci{font-size:18px;margin-bottom:5px}.ct{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:3px}
+.cb{font-size:12px;color:#64748b;line-height:1.5}
+code{font-family:monospace;font-size:12px;background:#f1f5f9;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0}
+.cw{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin:10px 0}
+.ch{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:7px 13px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:13px 16px;font-size:12px;line-height:1.8;overflow-x:auto;font-family:monospace;white-space:pre}
+.tk{color:#93c5fd}.tp{color:#c4b5fd}.tv{color:#6ee7b7}.ts{color:#fda4af}.tc{color:#475569;font-style:italic}
+.hl{background:#e3f2fd;border-left:3px solid #1565C0;padding:10px 13px;font-size:12.5px;color:#0d3c6e;line-height:1.55;margin:10px 0}
+.hl strong{color:#1565C0;font-weight:600}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+.box{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.box-h{padding:8px 13px;font-size:12px;font-weight:600}
+.box-b{padding:10px 13px;font-size:12px;color:#64748b;line-height:1.7}
+.map-row{display:flex;align-items:stretch;gap:0;margin:10px 0;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.map-der{flex:1;padding:12px 14px;background:#e3f2fd;font-size:12px;color:#0d3c6e;line-height:1.7}
+.map-arrow{display:flex;align-items:center;justify-content:center;width:38px;background:#1565C0;color:#fff;font-size:16px;flex-shrink:0}
+.map-sql{flex:1;padding:12px 14px;background:#1e293b;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:1.7}
+.map-der strong{color:#1565C0;display:block;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.map-sql strong{color:#93c5fd;display:block;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.eer-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;overflow-x:auto;min-width:420px;padding:12px}
+.eer-ent{border:2px solid #1565C0;min-width:110px;background:#fff}
+.eer-h{background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:5px 9px;text-align:center;text-transform:uppercase}
+.eer-b{padding:5px 9px;font-size:10.5px;color:#475569;line-height:1.9;font-family:monospace}
+.eer-pk{color:#f59e0b;font-weight:700}.eer-fk{color:#1565C0;font-weight:700}
+.eer-rel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:55px;gap:3px}
+.eer-lbl{font-size:10px;font-weight:600;color:#1565C0;background:#bbdefb;padding:2px 6px;border-radius:8px;white-space:nowrap}
+.qb{margin-bottom:16px}
+.qa{font-size:13.5px;font-weight:600;color:#1e293b;margin-bottom:11px;line-height:1.5}
+.qo{display:flex;flex-direction:column;gap:7px}
+.qop{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s;color:#1e293b}
+.qop:hover:not(.correct):not(.wrong):not(.dimmed){border-color:#1976D2;background:#e3f2fd}
+.qop.correct{background:#f0fdf4;border-color:#86efac;color:#15803d;pointer-events:none}
+.qop.wrong{background:#fef2f2;border-color:#fca5a5;color:#dc2626;pointer-events:none}
+.qop.dimmed{opacity:.4;pointer-events:none}
+.qfb{margin-top:9px;padding:9px 13px;border-radius:8px;font-size:12.5px;line-height:1.5;display:none}
+.rl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ri{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px 13px}
+.rn{width:23px;height:23px;min-width:23px;border-radius:6px;background:#bbdefb;color:#1565C0;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rt{font-size:13px;color:#64748b;line-height:1.55}.rt strong{color:#1e293b;font-weight:600}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-top:1px solid #e2e8f0;background:#fff;flex-shrink:0}
+.nb{background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;padding:7px 17px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.nb:hover{background:#e2e8f0}.nb.pr{background:#1565C0;color:#fff;border-color:#1565C0}.nb.pr:hover{background:#0d47a1}
+.nb:disabled{opacity:.35;pointer-events:none}
+.nc{font-size:12px;color:#94a3b8}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;letter-spacing:.03em;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#e3f2fd}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:11px">
+      <span class="badge">Aula 02</span>
+      <div>
+        <div class="hdr-title">Do DER ao SQL — Exposição Dialogada</div>
+        <div class="hdr-sub">45 minutos · Projetor · Turma</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div class="timer" id="timer">45:00</div>
+      <button class="next-stage" onclick="window.location.href='a02_demo_ao_vivo.html'">💻 Demo →</button>
+    </div>
+  </div>
+  <div class="dots" id="dots-bar"></div>
+  <div class="slide-area" id="slide-area"></div>
+  <div class="nav">
+    <button class="nb" id="btn-prev" onclick="goNav(-1)" disabled>← Anterior</button>
+    <span class="nc" id="counter">1 / 9</span>
+    <button class="nb pr" id="btn-next" onclick="goNav(1)">Próximo →</button>
+  </div>
+  <div class="kz-footer">
+    <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      @karizeviecelli
+    </a>
+    <span>·</span><span>© 2026</span>
+  </div>
+</div>
+<script>
+var cur=0,timerStarted=false,timerInterval=null;
+var SLIDES=[
+function(){return '<div class="ey">Abertura · 3 min</div><div class="stitle">Do diagrama para o banco real</div><div class="ssub">Na aula anterior desenhamos o modelo. Hoje fazemos a ponte: cada decisão do DER vira uma instrução SQL. Entidade vira CREATE TABLE, atributo vira coluna, relacionamento 1:N vira chave estrangeira.</div><div class="cards"><div class="card ac"><div class="ci">📐→💻</div><div class="ct">DER como planta</div><div class="cb">O DER é a planta do banco. O SQL é a construção. A planta não mente — se o relacionamento está errado no diagrama, ficará errado no banco.</div></div><div class="card ac"><div class="ci">🔗</div><div class="ct">Relacionamentos viram FKs</div><div class="cb">Linha 1:N no diagrama = FOREIGN KEY na tabela do lado N. O banco usa a FK para garantir integridade automaticamente.</div></div><div class="card"><div class="ci">💬</div><div class="ct">Pergunta de revisão</div><div class="cb"><em>"Abram o arquivo do draw.io da aula anterior. Quantas entidades têm? Quantos relacionamentos? Qual a cardinalidade de cada um?"</em></div></div><div class="card"><div class="ci">🎯</div><div class="ct">O que veremos</div><div class="cb">Regras de mapeamento DER→SQL, PRIMARY KEY, FOREIGN KEY, tipos de dados e primeiros INSERTs no Workbench.</div></div>';},
+function(){return '<div class="ey">Mapeamento · 5 min</div><div class="stitle">Regras de mapeamento DER → SQL</div><div class="ssub">Cada elemento do DER tem uma tradução direta para SQL. Essas regras são universais — valem para qualquer banco relacional.</div><div class="map-row"><div class="map-der"><strong>No DER</strong>Entidade (retângulo)<br>Atributo<br>Atributo sublinhado (PK)<br>Relacionamento 1:N<br>Relacionamento N:M</div><div class="map-arrow">→</div><div class="map-sql"><strong>No SQL</strong>CREATE TABLE<br>Coluna com tipo de dado<br>PRIMARY KEY (+ AUTO_INCREMENT)<br>FOREIGN KEY na tabela N<br>Nova tabela associativa + 2 FKs</div></div><div class="hl"><strong>Regra de ouro:</strong> o lado "N" de um relacionamento 1:N sempre recebe a FOREIGN KEY. Categoria (1) → Produto (N): a FK fica em Produto, apontando para Categoria.</div>';},
+function(){return '<div class="ey">PRIMARY KEY · 4 min</div><div class="stitle">Chave Primária — identificando cada linha</div><div class="ssub">A chave primária (PK) é a implementação do atributo sublinhado do DER. Identifica unicamente cada registro da tabela.</div><div class="cw"><div class="ch"><span>SQL · PRIMARY KEY</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div><pre><span class="tk">CREATE TABLE</span> categoria (\n  id_categoria  <span class="tp">INT</span>           <span class="tv">AUTO_INCREMENT PRIMARY KEY</span>,\n  nome          <span class="tp">VARCHAR</span>(<span class="ts">80</span>)  <span class="tv">NOT NULL</span>,\n  descricao     <span class="tp">VARCHAR</span>(<span class="ts">255</span>)\n);\n</pre></div><div class="cards"><div class="card ac"><div class="ct">🔑 AUTO_INCREMENT</div><div class="cb">MySQL gera o ID automaticamente: 1, 2, 3... Não informamos no INSERT.</div></div><div class="card ac"><div class="ct">📐 Convenção de nome</div><div class="cb">Padrão do curso: <code>id_tabela</code>. Ex: <code>id_categoria</code>, <code>id_produto</code>, <code>id_cliente</code>.</div></div><div class="card"><div class="ct">⚠️ NOT NULL</div><div class="cb">PK nunca pode ser NULL. AUTO_INCREMENT garante isso. Atributos obrigatórios do DER viram NOT NULL.</div></div></div>';},
+function(){return '<div class="ey">Tipos de dados · 4 min</div><div class="stitle">Atributos do DER → tipos SQL</div><div class="ssub">Cada atributo precisa de um tipo de dado. A escolha afeta armazenamento e precisão.</div><div class="cw"><div class="ch"><span>SQL · tipos mais usados</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div><pre><span class="tk">CREATE TABLE</span> produto (\n  id_produto  <span class="tp">INT</span>           <span class="tv">AUTO_INCREMENT PRIMARY KEY</span>,\n  nome        <span class="tp">VARCHAR</span>(<span class="ts">100</span>)  <span class="tv">NOT NULL</span>,    <span class="tc">-- texto variável</span>\n  preco       <span class="tp">DECIMAL</span>(<span class="ts">10,2</span>) <span class="tv">NOT NULL</span>,    <span class="tc">-- dinheiro: 49.90</span>\n  estoque     <span class="tp">INT</span>           <span class="tv">DEFAULT 0</span>,   <span class="tc">-- inteiro</span>\n  ativo       <span class="tp">TINYINT</span>(<span class="ts">1</span>)   <span class="tv">DEFAULT 1</span>    <span class="tc">-- booleano</span>\n);\n</pre></div><div class="hl"><strong>Para dinheiro, sempre DECIMAL</strong> — nunca FLOAT. FLOAT usa ponto flutuante binário e pode gerar erros de arredondamento em cálculos financeiros.</div>';},
+function(){return '<div class="ey">FOREIGN KEY · 5 min</div><div class="stitle">Chave Estrangeira — implementando o 1:N</div><div class="ssub">O relacionamento 1:N do DER vira uma FOREIGN KEY na tabela do lado N. É o banco que garante que o relacionamento seja válido.</div><div class="cw"><div class="ch"><span>SQL · FOREIGN KEY — Categoria → Produto (1:N)</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div><pre><span class="tk">CREATE TABLE</span> produto (\n  id_produto    <span class="tp">INT</span>           <span class="tv">AUTO_INCREMENT PRIMARY KEY</span>,\n  id_categoria  <span class="tp">INT</span>           <span class="tv">NOT NULL</span>,         <span class="tc">-- FK</span>\n  nome          <span class="tp">VARCHAR</span>(<span class="ts">100</span>)  <span class="tv">NOT NULL</span>,\n  preco         <span class="tp">DECIMAL</span>(<span class="ts">10,2</span>) <span class="tv">NOT NULL</span>,\n  estoque       <span class="tp">INT</span>           <span class="tv">DEFAULT 0</span>,\n\n  <span class="tv">FOREIGN KEY</span> (id_categoria)\n    <span class="tv">REFERENCES</span> categoria(id_categoria)\n    <span class="tv">ON DELETE RESTRICT</span>\n);\n</pre></div><div class="hl"><strong>ON DELETE RESTRICT</strong> protege: se uma categoria tem produtos, o banco recusa deletá-la. Garante que o DER seja respeitado no banco real.</div>';},
+function(){return '<div class="ey">INSERT e SELECT · 4 min</div><div class="stitle">Inserir e consultar dados</div><div class="ssub">Com as tabelas criadas, populamos com dados e consultamos. A ordem importa: inserir o pai antes do filho.</div><div class="cw"><div class="ch"><span>SQL · INSERT na ordem certa</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div><pre><span class="tc">-- 1. Inserir na tabela pai primeiro</span>\n<span class="tk">INSERT INTO</span> categoria (nome) <span class="tk">VALUES</span>\n  (<span class="ts">\'Roupas\'</span>),\n  (<span class="ts">\'Calçados\'</span>);\n\n<span class="tc">-- 2. Inserir na tabela filha referenciando a PK</span>\n<span class="tk">INSERT INTO</span> produto (id_categoria, nome, preco)\n<span class="tk">VALUES</span>\n  (<span class="tv">1</span>, <span class="ts">\'Camiseta Azul\'</span>, <span class="tv">49.90</span>),\n  (<span class="tv">1</span>, <span class="ts">\'Calça Jeans\'</span>,  <span class="tv">129.90</span>),\n  (<span class="tv">2</span>, <span class="ts">\'Tênis Branco\'</span>, <span class="tv">219.90</span>);\n\n<span class="tc">-- 3. Consultar</span>\n<span class="tk">SELECT</span> * <span class="tk">FROM</span> produto;\n</pre></div>';},
+function(){return '<div class="ey">EER no Workbench · 4 min</div><div class="stitle">Diagrama EER — ver o DER dentro do Workbench</div><div class="ssub">Após criar as tabelas com FKs, o Workbench consegue gerar automaticamente o diagrama EER — que é a representação visual do banco em crow\'s foot.</div><div class="cards"><div class="card ac"><div class="ci">🗺️</div><div class="ct">Como gerar</div><div class="cb">Menu <strong>Database → Reverse Engineer</strong>. Selecione o schema → avançar → o Workbench desenha as entidades e relacionamentos automaticamente.</div></div><div class="card ac"><div class="ci">🔗</div><div class="ct">O que aparece</div><div class="cb">Tabelas como entidades. Linhas representando as FKs com símbolos crow\'s foot — exatamente o que modelamos no draw.io.</div></div><div class="card"><div class="ci">💡</div><div class="ct">Sem FK, sem linha</div><div class="cb">Se a FK não foi declarada no SQL, o Workbench não consegue desenhar o relacionamento. O DER e o EER devem bater.</div></div></div><div class="hl"><strong>Ciclo completo:</strong> DER no draw.io → SQL no Workbench → EER gerado pelo Workbench. Os três devem ser equivalentes.</div>';},
+function(){return '<div class="ey">Quiz · 3 min</div><div class="stitle">Verificação de aprendizagem</div><div class="ssub">Turma responde junto.</div><div class="qb"><div class="qa">1. No DER, a entidade "Categoria" tem relacionamento 1:N com "Produto". Ao criar as tabelas SQL, onde fica a FOREIGN KEY?</div><div class="qo"><div class="qop" onclick="ansQ(this,\'w\',\'f0\')"><span>A</span>Na tabela Categoria</div><div class="qop" onclick="ansQ(this,\'c\',\'f0\')"><span>B</span>Na tabela Produto — lado N</div><div class="qop" onclick="ansQ(this,\'w\',\'f0\')"><span>C</span>Em ambas as tabelas</div><div class="qop" onclick="ansQ(this,\'w\',\'f0\')"><span>D</span>Em nenhuma — FK não é necessária</div></div><div class="qfb" id="f0" style="background:#f0fdf4;color:#15803d">Correto! A FK sempre fica na tabela do lado N do relacionamento. Produto é o "muitos" — então id_categoria (FK) fica em Produto, apontando para categoria(id_categoria).</div></div><div class="qb"><div class="qa">2. Qual a ordem correta ao inserir dados em tabelas relacionadas?</div><div class="qo"><div class="qop" onclick="ansQ(this,\'w\',\'f1\')"><span>A</span>Não importa a ordem</div><div class="qop" onclick="ansQ(this,\'w\',\'f1\')"><span>B</span>Inserir a tabela filha antes da pai</div><div class="qop" onclick="ansQ(this,\'c\',\'f1\')"><span>C</span>Inserir a tabela pai antes da filha</div><div class="qop" onclick="ansQ(this,\'w\',\'f1\')"><span>D</span>Inserir as duas ao mesmo tempo</div></div><div class="qfb" id="f1" style="background:#f0fdf4;color:#15803d">Correto! A FK na tabela filha referencia um ID que já deve existir na tabela pai. Se inserirmos Produto antes de Categoria existir, o banco retorna erro de constraint.</div></div>';},
+function(){return '<div class="ey">Encerramento · 2 min</div><div class="stitle">Recapitulando</div><div class="ssub">O que aprendemos e o que fazemos agora.</div><div class="rl"><div class="ri"><div class="rn">1</div><div class="rt"><strong>Regras de mapeamento.</strong> Entidade → CREATE TABLE. Atributo → coluna com tipo. PK → AUTO_INCREMENT PRIMARY KEY. Relacionamento 1:N → FOREIGN KEY no lado N.</div></div><div class="ri"><div class="rn">2</div><div class="rt"><strong>Tipos de dados.</strong> INT para inteiros, VARCHAR(n) para texto, DECIMAL(10,2) para dinheiro, DATE para datas, TINYINT(1) para booleano.</div></div><div class="ri"><div class="rn">3</div><div class="rt"><strong>FOREIGN KEY.</strong> Implementa o relacionamento 1:N. ON DELETE RESTRICT protege a integridade — não permite deletar pai com filhos.</div></div><div class="ri"><div class="rn">4</div><div class="rt"><strong>Ordem de criação e INSERT.</strong> Sempre criar e popular a tabela pai antes da filha. A FK precisa que o ID referenciado já exista.</div></div><div class="ri"><div class="rn">5</div><div class="rt"><strong>EER no Workbench.</strong> Database → Reverse Engineer gera o diagrama visual crow\'s foot automaticamente a partir das FKs declaradas no SQL.</div></div></div><div class="hl"><strong>Próximo passo:</strong> demo ao vivo — pegar o DER da aula 1 e criar todas as tabelas no Workbench, incluindo FOREIGN KEY e primeiros INSERTs.</div>';}
+];
+function ansQ(el,t,id){var qb=el.closest('.qb');qb.querySelectorAll('.qop').forEach(function(o){if(o===el)o.classList.add(t==='c'?'correct':'wrong');else o.classList.add('dimmed');});var fb=document.getElementById(id);if(t!=='c'){fb.style.background='#fef2f2';fb.style.color='#dc2626';fb.textContent='Não exatamente — relembre as regras de mapeamento DER→SQL.';}fb.style.display='block';}
+function buildDots(){var bar=document.getElementById('dots-bar');bar.innerHTML='';for(var i=0;i<SLIDES.length;i++){var d=document.createElement('span');d.className='dot'+(i===0?' active':'');d.onclick=(function(idx){return function(){goTo(idx);};})(i);bar.appendChild(d);if(i<SLIDES.length-1){var sep=document.createElement('div');sep.className='dsep';bar.appendChild(sep);}}}
+function buildSlides(){var area=document.getElementById('slide-area');area.innerHTML='';for(var i=0;i<SLIDES.length;i++){var div=document.createElement('div');div.className='slide'+(i===0?' active':'');div.id='slide-'+i;div.innerHTML=SLIDES[i]();area.appendChild(div);}}
+function goTo(i){document.getElementById('slide-'+cur).classList.remove('active');var dots=document.querySelectorAll('.dot');dots[cur].classList.remove('active');if(i>cur)dots[cur].classList.add('done');cur=i;var el=document.getElementById('slide-'+cur);el.innerHTML=SLIDES[cur]();el.classList.add('active');dots[cur].classList.add('active');dots[cur].classList.remove('done');document.getElementById('slide-area').scrollTop=0;document.getElementById('btn-prev').disabled=(cur===0);var bn=document.getElementById('btn-next');bn.disabled=(cur===SLIDES.length-1);bn.textContent=(cur===SLIDES.length-1)?'Finalizar':'Próximo →';document.getElementById('counter').textContent=(cur+1)+' / '+SLIDES.length;if(!timerStarted){timerStarted=true;startTimer();}}
+function goNav(dir){var ni=cur+dir;if(ni>=0&&ni<SLIDES.length)goTo(ni);}
+function startTimer(){var rem=45*60;var el=document.getElementById('timer');timerInterval=setInterval(function(){rem--;var m=Math.floor(rem/60),s=rem%60;el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(rem<=300)el.className='timer warn';if(rem<=60)el.className='timer danger';if(rem<=0){clearInterval(timerInterval);el.textContent='00:00';}},1000);}
+buildDots();buildSlides();document.getElementById('btn-prev').disabled=true;
+</script>
+</body>
+</html>

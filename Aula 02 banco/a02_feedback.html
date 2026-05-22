@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback — Do DER ao SQL · Aula 02</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px}
+.ttitle{font-size:17px;font-weight:600}.tmeta{font-size:12px;color:#64748b;margin-top:1px}
+.chip{font-size:13px;font-weight:500;padding:5px 13px;border-radius:20px;background:#bbdefb;border:1px solid #90caf9;color:#1565C0;font-family:'Courier New',monospace}
+.tbtn{font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.tbtn:hover{background:#f1f5f9}.tbtn.act{background:#1565C0;color:#fff;border-color:#1565C0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px;text-align:center}
+.sn{font-size:23px;font-weight:500;color:#1e293b}.sl{font-size:11px;color:#64748b;margin-top:2px}
+.empty-state{background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;color:#94a3b8}
+.empty-state p{font-size:13px;margin-bottom:12px}
+.empty-btn{display:inline-flex;align-items:center;gap:6px;background:#1565C0;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.empty-btn:hover{background:#0d47a1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:8px}
+.ac{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ac.pres{border:2px solid #1565C0}.ac.conc{border-color:#86efac}
+.at{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #f1f5f9}
+.del-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:15px;line-height:1;padding:2px 5px;border-radius:4px;margin-left:auto;flex-shrink:0;transition:color .15s}
+.del-btn:hover{color:#ef4444}
+.av{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.an{font-size:13px;font-weight:600;line-height:1.2}.as{font-size:11px;color:#94a3b8;margin-top:1px}
+.ab{padding:10px 12px}
+.stars{display:flex;gap:3px;margin-bottom:7px}
+.star{font-size:17px;cursor:pointer;color:#e2e8f0;user-select:none}.star.on{color:#f59e0b}
+.chks{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+.chk2{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
+.mc{width:13px;height:13px;border-radius:3px;border:1px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc.on{background:#22c55e;border-color:#22c55e}
+.mc svg{display:none}.mc.on svg{display:block}
+.note{width:100%;border:1px solid #e2e8f0;border-radius:5px;padding:5px 7px;font-size:11px;font-family:inherit;color:#1e293b;background:#fff;resize:none;outline:none}
+.note:focus{border-color:#1565C0}
+.acts{display:flex;gap:5px;margin-top:7px}
+.act{flex:1;font-size:11px;padding:5px 4px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;font-family:inherit;text-align:center;transition:all .12s}
+.act:hover{background:#bbdefb;color:#1565C0;border-color:#90caf9}
+.act.pon{background:#bbdefb;color:#1565C0;border-color:#1565C0}
+.act.don{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.col{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.colh{padding:11px 15px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:13px;font-weight:600;color:#475569}
+.colb{padding:13px 15px;display:flex;flex-direction:column;gap:7px}
+.pto{border:1px solid #e2e8f0;border-radius:7px;padding:9px 11px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:9px}
+.pto:hover{border-color:#90caf9;background:#e3f2fd}.pto.used{border-color:#90caf9;background:#bbdefb}
+.pto-ic{width:23px;height:23px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.pto-tx{font-size:12px;color:#475569;line-height:1.5;flex:1}.pto.used .pto-tx{color:#0d3c6e}
+.pto-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;background:#fef3c7;color:#92400e;white-space:nowrap;flex-shrink:0}
+.pto.used .pto-tag{background:#bbdefb;color:#1565C0}
+.add-area{display:flex;gap:7px;padding:11px 15px;border-top:1px solid #e2e8f0}
+.add-area input{flex:1;border:1px solid #e2e8f0;border-radius:6px;padding:6px 9px;font-size:12px;font-family:inherit;color:#1e293b;background:#fff;outline:none}
+.add-area input:focus{border-color:#1565C0}
+.add-area button{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #90caf9;background:#bbdefb;color:#0d3c6e;cursor:pointer;font-family:inherit;font-weight:500}
+@media(max-width:580px){.stats{grid-template-columns:1fr 1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><div class="ttitle">Painel de apresentações — Aula 02</div><div class="tmeta">Do DER ao SQL no Workbench · 30 minutos</div></div>
+    <span class="chip" id="tchip">30:00</span>
+    <button class="tbtn" id="tbtn" onclick="startTimer()">Iniciar sessão</button>
+    <button class="tbtn" onclick="addAluno()">+ Aluno</button>
+    <button class="tbtn" onclick="limparDados()" style="background:#fef2f2;color:#991b1b;border-color:#fca5a5">🗑 Limpar dados</button>
+    <button class="tbtn" onclick="if(confirm('Encerrar a sessão?'))window.close()" style="background:#f0fdf4;color:#15803d;border-color:#86efac">✅ Encerrar</button>
+    <span id="save-indicator" style="font-size:11px;color:#15803d;opacity:0;transition:opacity .4s;white-space:nowrap">✓ salvo</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sn" id="s-total">0</div><div class="sl">Alunos</div></div>
+    <div class="stat"><div class="sn" id="s-pres">0</div><div class="sl">Apresentaram</div></div>
+    <div class="stat"><div class="sn" id="s-med">—</div><div class="sl">Nota média</div></div>
+    <div class="stat"><div class="sn" id="s-pontos">0</div><div class="sl">Pontos discutidos</div></div>
+  </div>
+  <div id="grid-container"></div>
+  <div class="col">
+    <div class="colh">Pontos de discussão coletiva</div>
+    <div class="colb" id="pontos"></div>
+    <div class="add-area"><input type="text" id="novo" placeholder="Adicionar ponto de discussão..." onkeydown="if(event.key==='Enter')addPonto()"><button onclick="addPonto()">Adicionar</button></div>
+  </div>
+</div>
+<script>
+const STORAGE_KEY='feedback_a02_bd_wb';
+const CORES=[{bg:'#bbdefb',txt:'#1565C0'},{bg:'#ccfbf1',txt:'#0f766e'},{bg:'#fef3c7',txt:'#92400e'},{bg:'#fce7f3',txt:'#9d174d'},{bg:'#dcfce7',txt:'#166534'},{bg:'#fee2e2',txt:'#991b1b'},{bg:'#e0f2fe',txt:'#0369a1'},{bg:'#f3e8ff',txt:'#6b21a8'}];
+const CHECKS=['Mapeamento DER correto (3 entidades)','FK declarada na tabela N','Ordem de inserção respeitada (pai antes)','Integridade FK testada (Error 1452)','EER gerado no Workbench'];
+const PONTOS_BASE=[
+  {t:'Por que a FK fica no lado N e não no lado 1 do relacionamento?',tag:'FK'},
+  {t:'O que acontece com ON DELETE RESTRICT vs ON DELETE CASCADE?',tag:'integridade'},
+  {t:'Por que usamos DECIMAL(10,2) e não FLOAT para preço?',tag:'tipos'},
+  {t:'Qual a diferença entre CREATE TABLE e ALTER TABLE?',tag:'DDL'},
+  {t:'Como o Workbench gera o EER a partir das FKs? O que acontece se a FK não foi declarada?',tag:'EER'},
+  {t:'Preview aula 3: como JOIN conecta dados de duas tabelas em um só SELECT?',tag:'próxima aula'},
+];
+function salvar(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({alunos,pontos,tSec}));flashSave();}catch(e){}}
+function carregar(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;const d=JSON.parse(raw);if(d.alunos)alunos=d.alunos;if(d.pontos)pontos=d.pontos;if(typeof d.tSec==='number')tSec=d.tSec;return true;}catch(e){return false;}}
+function flashSave(){const el=document.getElementById('save-indicator');if(!el)return;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';},1400);}
+function limparDados(){if(!confirm('Apagar todos os dados salvos?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+let alunos=[],pontos=PONTOS_BASE.map(p=>({...p,used:false}));
+let tSec=30*60,tInterval=null,ticking=false;
+function init(n){return n.trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+function buildAlunos(){
+  const container=document.getElementById('grid-container');
+  if(alunos.length===0){container.innerHTML='<div class="empty-state"><p>Nenhum aluno cadastrado.<br>Clique em <strong>+ Aluno</strong> para adicionar.</p><button class="empty-btn" onclick="addAluno()">+ Adicionar primeiro aluno</button></div>';updateStats();return;}
+  const g=document.createElement('div');g.className='grid';
+  alunos.forEach((a,ai)=>{
+    const av=CORES[a.cor%CORES.length];
+    const stLbl=a.status==='pendente'?'Aguardando':a.status==='apresentando'?'Apresentando agora':'Concluído';
+    const card=document.createElement('div');
+    card.className='ac'+(a.status==='apresentando'?' pres':'')+(a.status==='concluido'?' conc':'');
+    card.innerHTML=`<div class="at"><div class="av" style="background:${av.bg};color:${av.txt}">${a.iniciais}</div><div><div class="an" style="color:${av.txt}">${a.nome}</div><div class="as">${stLbl}</div></div><button class="del-btn" onclick="excluirAluno(${ai})" title="Excluir aluno">✕</button></div><div class="ab"><div class="stars">${[1,2,3,4,5].map(n=>`<span class="star${a.nota>=n?' on':''}" onclick="setStar(${ai},${n})">&#9733;</span>`).join('')}</div><div class="chks">${CHECKS.map((c,ci)=>`<div class="chk2"><div class="mc${a.checks[ci]?' on':''}" id="mc-${ai}-${ci}" onclick="togChk(${ai},${ci})"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5 4-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>${c}</span></div>`).join('')}</div><textarea class="note" rows="2" placeholder="Observações..." oninput="saveNote(${ai},this.value)">${a.nota_txt}</textarea><div class="acts"><div class="act${a.status==='apresentando'?' pon':''}" onclick="setStatus(${ai},'apresentando')">Apresentando</div><div class="act${a.status==='concluido'?' don':''}" onclick="setStatus(${ai},'concluido')">Concluído</div></div></div>`;
+    g.appendChild(card);
+  });
+  container.innerHTML='';container.appendChild(g);updateStats();
+}
+function setStar(ai,n){alunos[ai].nota=alunos[ai].nota===n?0:n;buildAlunos();salvar();}
+function togChk(ai,ci){alunos[ai].checks[ci]=!alunos[ai].checks[ci];const el=document.getElementById('mc-'+ai+'-'+ci);if(el)el.classList.toggle('on');updateStats();salvar();}
+function setStatus(ai,s){alunos[ai].status=alunos[ai].status===s?'pendente':s;buildAlunos();salvar();}
+function saveNote(ai,v){alunos[ai].nota_txt=v;salvar();}
+function addAluno(){const n=prompt('Nome do aluno:');if(!n||!n.trim())return;alunos.push({nome:n.trim(),iniciais:init(n),cor:alunos.length%CORES.length,nota:0,checks:new Array(5).fill(false),status:'pendente',nota_txt:''});buildAlunos();salvar();}
+function excluirAluno(ai){if(!confirm(`Excluir "${alunos[ai].nome}"?`))return;alunos.splice(ai,1);buildAlunos();salvar();}
+function updateStats(){document.getElementById('s-total').textContent=alunos.length;document.getElementById('s-pres').textContent=alunos.filter(a=>a.status==='concluido').length;const rated=alunos.filter(a=>a.nota>0);document.getElementById('s-med').textContent=rated.length?(rated.reduce((s,a)=>s+a.nota,0)/rated.length).toFixed(1)+'★':'—';document.getElementById('s-pontos').textContent=pontos.filter(p=>p.used).length;}
+function buildPontos(){const el=document.getElementById('pontos');el.innerHTML='';pontos.forEach((p,i)=>{const d=document.createElement('div');d.className='pto'+(p.used?' used':'');d.onclick=()=>{p.used=!p.used;buildPontos();updateStats();salvar();};d.innerHTML=`<div class="pto-ic" style="background:${p.used?'#bbdefb':'#f1f5f9'};color:${p.used?'#1565C0':'#64748b'}">${p.used?'✓':'?'}</div><div class="pto-tx">${p.t}</div><div class="pto-tag">${p.tag}</div>`;el.appendChild(d);});}
+function addPonto(){const inp=document.getElementById('novo');const v=inp.value.trim();if(!v)return;pontos.push({t:v,tag:'custom',used:false});inp.value='';buildPontos();salvar();}
+function startTimer(){const btn=document.getElementById('tbtn');if(!ticking){ticking=true;btn.textContent='Pausar';btn.className='tbtn act';tInterval=setInterval(()=>{tSec--;salvar();const m=Math.floor(tSec/60),s=tSec%60;const chip=document.getElementById('tchip');chip.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(tSec<=300)chip.style.color='#d97706';if(tSec<=60)chip.style.color='#dc2626';if(tSec<=0){clearInterval(tInterval);ticking=false;btn.textContent='Encerrado';btn.disabled=true;}},1000);}else{ticking=false;clearInterval(tInterval);btn.textContent='Continuar';btn.className='tbtn';}}
+carregar();
+const _m=Math.floor(tSec/60),_s=tSec%60;
+document.getElementById('tchip').textContent=((_m<10?'0':'')+_m+':'+(_s<10?'0':'')+_s);
+buildAlunos();buildPontos();
+</script>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+</body>
+</html>

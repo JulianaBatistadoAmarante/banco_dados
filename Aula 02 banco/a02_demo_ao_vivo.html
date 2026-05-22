@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo ao Vivo — Do DER ao SQL · Aula 02</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.full{grid-column:1/-1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.page-hdr h1{font-size:16px;font-weight:600}.page-hdr p{font-size:12px;color:#94a3b8}
+.prog-track{height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#1565C0;border-radius:2px;transition:width .3s;width:0%}
+.panel{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+.editor{background:#1e293b;min-height:340px;padding:15px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;overflow:hidden}
+#code-out{white-space:pre-wrap;word-break:break-all;color:#94a3b8}
+.cursor{display:inline-block;width:2px;height:14px;background:#60a5fa;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.preview{min-height:340px;padding:15px;overflow-y:auto;background:#fff}
+.narr{background:#e3f2fd;border:1px solid #90caf9;border-radius:10px;padding:11px 14px;font-size:13px;color:#0d3c6e;line-height:1.6;min-height:50px}
+.narr strong{color:#1565C0}
+.step-bar{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;background:#bbdefb;color:#1565C0}
+.slabel{font-size:12px;color:#64748b;flex:1}
+.cb2{font-size:12px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.cb2:hover{background:#f1f5f9}.cb2.go{background:#1565C0;color:#fff;border-color:#1565C0}.cb2.go:hover{background:#0d47a1}
+.cb2:disabled{opacity:.35;pointer-events:none}
+.k{color:#93c5fd}.p{color:#c4b5fd}.v{color:#6ee7b7}.s{color:#fda4af}.c{color:#475569;font-style:italic}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#e3f2fd}
+.der-ref{background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:10px 13px;font-size:12px;color:#0d3c6e;margin-bottom:8px}
+.der-ref strong{color:#1565C0;display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="full page-hdr">
+    <h1>Demo ao Vivo — Do DER ao SQL no Workbench</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <p>Aula 02 · 30 min · Docente digita, alunos acompanham</p>
+      <button class="next-stage" onclick="window.location.href='a02_pratica_guiada.html'">📝 Prática →</button>
+    </div>
+  </div>
+  <div class="full prog-track"><div class="prog-fill" id="prog"></div></div>
+  <div class="panel">
+    <div class="ph"><span>MySQL Workbench — Editor SQL</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="editor"><span id="code-out"></span><span class="cursor"></span></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span>DER de origem → Resultado SQL</span><div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="full narr" id="narr">Pronto. Clique em <strong>Iniciar digitação</strong> para começar.</div>
+  <div class="full step-bar">
+    <span class="sbadge" id="sbadge">Etapa 1 / 7</span>
+    <span class="slabel" id="sdesc">Criar banco e tabela categoria</span>
+    <button class="cb2" id="bp" onclick="prevS()" disabled>← Anterior</button>
+    <button class="cb2 go" id="bplay" onclick="playS()">▶ Iniciar digitação</button>
+    <button class="cb2" id="bn" onclick="nextS()" disabled>Próxima →</button>
+  </div>
+</div>
+<script>
+const STEPS=[
+{label:"Criar banco e tabela categoria",
+narr:"<strong>Docente:</strong> \"Abrimos o DER da aula 1. Primeira entidade: Categoria. id_categoria é o atributo sublinhado — vira INT AUTO_INCREMENT PRIMARY KEY. Nome é NOT NULL. Descricao é opcional — sem NOT NULL.\"",
+code:`<span class="c">-- Criar e selecionar o banco</span>
+<span class="k">CREATE DATABASE</span> loja;
+<span class="k">USE</span> loja;
+
+<span class="c">-- DER: CATEGORIA (id_categoria PK, nome, descricao)</span>
+<span class="k">CREATE TABLE</span> categoria (
+  id_categoria  <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  nome          <span class="p">VARCHAR</span>(<span class="s">80</span>)  <span class="v">NOT NULL</span>,
+  descricao     <span class="p">VARCHAR</span>(<span class="s">255</span>)
+);`,
+prev:`<div style="font-family:system-ui;padding:14px"><div class="der-ref"><strong>DER de origem (Aula 1)</strong>CATEGORIA: <u>id_categoria</u>, nome, descricao<br>Relacionamento: CATEGORIA (1) ──► PRODUTO (N)</div><div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;font-size:13px;color:#15803d"><strong>✅ Banco loja criado · Tabela categoria criada</strong></div></div>`},
+{label:"Criar tabela produto com FOREIGN KEY",
+narr:"<strong>Docente:</strong> \"Produto é o lado N do relacionamento 1:N com Categoria. Por isso a FK fica aqui. id_categoria INT NOT NULL + FOREIGN KEY declarada. ON DELETE RESTRICT: se tentar deletar uma categoria com produtos, o banco recusa.\"",
+code:`<span class="c">-- DER: PRODUTO (id_produto PK, nome, preco, estoque)</span>
+<span class="c">-- DER: relação 1:N com CATEGORIA → FK em produto</span>
+<span class="k">CREATE TABLE</span> produto (
+  id_produto    <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  id_categoria  <span class="p">INT</span>           <span class="v">NOT NULL</span>,
+  nome          <span class="p">VARCHAR</span>(<span class="s">100</span>)  <span class="v">NOT NULL</span>,
+  preco         <span class="p">DECIMAL</span>(<span class="s">10,2</span>) <span class="v">NOT NULL</span>,
+  estoque       <span class="p">INT</span>           <span class="v">DEFAULT 0</span>,
+
+  <span class="v">FOREIGN KEY</span> (id_categoria)
+    <span class="v">REFERENCES</span> categoria(id_categoria)
+    <span class="v">ON DELETE RESTRICT</span>
+);`,
+prev:`<div style="font-family:system-ui;padding:14px"><div class="der-ref"><strong>Regra aplicada</strong>Relacionamento 1:N → FK na tabela do lado N<br>Categoria (1) ──► Produto (N) → id_categoria fica em produto</div><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="background:#1565C0;color:#fff;padding:6px 10px;text-align:left">Coluna</th><th style="background:#1565C0;color:#fff;padding:6px 10px;text-align:left">Tipo</th><th style="background:#1565C0;color:#fff;padding:6px 10px;text-align:left">Papel no DER</th></tr></thead><tbody><tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#f59e0b;font-weight:700">🔑 id_produto</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">INT AUTO_INCREMENT</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;color:#94a3b8">PK (atributo sublinhado)</td></tr><tr style="background:#f8fafc"><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#1565C0;font-weight:700">🔗 id_categoria</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">INT NOT NULL</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;color:#94a3b8">FK — relacionamento 1:N</td></tr><tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">nome</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">VARCHAR(100)</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;color:#94a3b8">Atributo NOT NULL</td></tr><tr style="background:#f8fafc"><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">preco</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">DECIMAL(10,2)</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;color:#94a3b8">Atributo numérico</td></tr><tr><td style="padding:6px 10px">estoque</td><td style="padding:6px 10px">INT</td><td style="padding:6px 10px;font-size:11px;color:#94a3b8">Atributo com DEFAULT</td></tr></tbody></table></div>`},
+{label:"Criar tabela cliente",
+narr:"<strong>Docente:</strong> \"Cliente não tem FK para nenhuma tabela ainda — no modelo simplificado da aula 1 é uma entidade independente. Email tem UNIQUE: dois clientes não podem usar o mesmo. Telefone é opcional.\"",
+code:`<span class="c">-- DER: CLIENTE (id_cliente PK, nome, email, telefone)</span>
+<span class="k">CREATE TABLE</span> cliente (
+  id_cliente  <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  nome        <span class="p">VARCHAR</span>(<span class="s">120</span>)  <span class="v">NOT NULL</span>,
+  email       <span class="p">VARCHAR</span>(<span class="s">120</span>)  <span class="v">UNIQUE NOT NULL</span>,
+  telefone    <span class="p">VARCHAR</span>(<span class="s">20</span>)
+);`,
+prev:`<div style="font-family:system-ui;padding:14px"><div class="der-ref"><strong>3 tabelas criadas — banco loja</strong>categoria → produto (1:N via FK) · cliente (independente)</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><div style="border:1.5px solid #1565C0;border-radius:5px;overflow:hidden;min-width:110px"><div style="background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:4px 9px;text-align:center">categoria</div><div style="padding:5px 9px;font-family:monospace;font-size:11px;color:#475569;line-height:1.9"><span style="color:#f59e0b;font-weight:700">🔑 id_categoria</span><br>nome<br>descricao</div></div><div style="align-self:center;color:#1565C0;font-size:13px">1──►N</div><div style="border:1.5px solid #1565C0;border-radius:5px;overflow:hidden;min-width:110px"><div style="background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:4px 9px;text-align:center">produto</div><div style="padding:5px 9px;font-family:monospace;font-size:11px;color:#475569;line-height:1.9"><span style="color:#f59e0b;font-weight:700">🔑 id_produto</span><br><span style="color:#1565C0;font-weight:700">🔗 id_categoria</span><br>nome<br>preco</div></div><div style="border:1.5px solid #1565C0;border-radius:5px;overflow:hidden;min-width:110px;margin-left:10px"><div style="background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:4px 9px;text-align:center">cliente</div><div style="padding:5px 9px;font-family:monospace;font-size:11px;color:#475569;line-height:1.9"><span style="color:#f59e0b;font-weight:700">🔑 id_cliente</span><br>nome<br>email<br>telefone</div></div></div></div>`},
+{label:"Inserir dados na ordem correta",
+narr:"<strong>Docente:</strong> \"Inserimos categorias primeiro — são o pai. Depois produtos referenciando as PKs das categorias. Se tentarmos inserir um produto com id_categoria = 99, o banco recusa porque 99 não existe.\"",
+code:`<span class="c">-- Pai primeiro: categorias</span>
+<span class="k">INSERT INTO</span> categoria (nome) <span class="k">VALUES</span>
+  (<span class="s">'Roupas'</span>),
+  (<span class="s">'Calçados'</span>),
+  (<span class="s">'Acessórios'</span>);
+
+<span class="c">-- Filho depois: produtos com id_categoria válido</span>
+<span class="k">INSERT INTO</span> produto (id_categoria, nome, preco, estoque)
+<span class="k">VALUES</span>
+  (<span class="v">1</span>, <span class="s">'Camiseta Azul'</span>,   <span class="v">49.90</span>,  <span class="v">100</span>),
+  (<span class="v">1</span>, <span class="s">'Calça Jeans'</span>,    <span class="v">129.90</span>,  <span class="v">45</span>),
+  (<span class="v">2</span>, <span class="s">'Tênis Branco'</span>,  <span class="v">219.90</span>,  <span class="v">30</span>);`,
+prev:`<div style="font-family:system-ui;padding:14px"><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px"><caption style="text-align:left;font-size:11px;color:#94a3b8;margin-bottom:4px">categoria</caption><thead><tr><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">id</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">nome</th></tr></thead><tbody><tr><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">1</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">Roupas</td></tr><tr style="background:#f8fafc"><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">2</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">Calçados</td></tr><tr><td style="padding:5px 9px">3</td><td style="padding:5px 9px">Acessórios</td></tr></tbody></table><table style="width:100%;border-collapse:collapse;font-size:12px"><caption style="text-align:left;font-size:11px;color:#94a3b8;margin-bottom:4px">produto</caption><thead><tr><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">id</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">id_cat</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">nome</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">preco</th></tr></thead><tbody><tr><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">1</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">1</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">Camiseta Azul</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">49.90</td></tr><tr style="background:#f8fafc"><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">2</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">1</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">Calça Jeans</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">129.90</td></tr><tr><td style="padding:5px 9px">3</td><td style="padding:5px 9px">2</td><td style="padding:5px 9px">Tênis Branco</td><td style="padding:5px 9px">219.90</td></tr></tbody></table></div>`},
+{label:"SELECT, WHERE e ORDER BY",
+narr:"<strong>Docente:</strong> \"Com dados inseridos, consultamos. SELECT traz os registros. WHERE filtra. ORDER BY ordena. O Workbench mostra o resultado em grade no painel inferior — Ctrl+Enter executa a linha onde o cursor está.\"",
+code:`<span class="c">-- Todos os produtos</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> produto;
+
+<span class="c">-- Filtrar por categoria 1 (Roupas)</span>
+<span class="k">SELECT</span> nome, preco <span class="k">FROM</span> produto
+<span class="k">WHERE</span> id_categoria = <span class="v">1</span>;
+
+<span class="c">-- Ordenar por preço</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> produto
+<span class="k">ORDER BY</span> preco <span class="v">ASC</span>;
+
+<span class="c">-- Testar integridade: produto com categoria inexistente</span>
+<span class="k">INSERT INTO</span> produto (id_categoria, nome, preco)
+<span class="k">VALUES</span> (<span class="v">99</span>, <span class="s">'Teste'</span>, <span class="v">0</span>);
+<span class="c">-- Error 1452: Cannot add or update a child row</span>`,
+prev:`<div style="font-family:system-ui;padding:14px"><p style="font-size:12px;color:#64748b;margin-bottom:8px">SELECT * FROM produto WHERE id_categoria = 1</p><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px"><thead><tr><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">nome</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">preco</th></tr></thead><tbody><tr><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">Camiseta Azul</td><td style="padding:5px 9px;border-bottom:1px solid #e2e8f0">49.90</td></tr><tr style="background:#f8fafc"><td style="padding:5px 9px">Calça Jeans</td><td style="padding:5px 9px">129.90</td></tr></tbody></table><div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:9px;font-size:12px;color:#991b1b">❌ Error 1452 — Cannot add or update a child row: id_categoria=99 não existe em categoria.</div></div>`},
+{label:"Gerar diagrama EER no Workbench",
+narr:"<strong>Docente:</strong> \"Agora a mágica: o Workbench lê as FKs que criamos e gera o diagrama EER automaticamente — igual ao DER que fizemos no draw.io na Aula 1, mas no formato crow's foot. Database → Reverse Engineer.\"",
+code:`<span class="c">-- Verificar FKs declaradas (para conferir antes do EER)</span>
+<span class="k">SELECT</span>
+  TABLE_NAME            <span class="k">AS</span> tabela,
+  COLUMN_NAME           <span class="k">AS</span> fk_coluna,
+  REFERENCED_TABLE_NAME <span class="k">AS</span> referencia
+<span class="k">FROM</span> INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+<span class="k">WHERE</span>
+  TABLE_SCHEMA = <span class="s">'loja'</span>
+  <span class="k">AND</span> REFERENCED_TABLE_NAME <span class="k">IS NOT NULL</span>;
+
+<span class="c">-- Depois: Database → Reverse Engineer → selecione 'loja'</span>`,
+prev:`<div style="font-family:system-ui;padding:14px"><div style="background:#e3f2fd;border-left:3px solid #1565C0;padding:9px 12px;font-size:12px;color:#0d3c6e;margin-bottom:10px"><strong>Workbench → Database → Reverse Engineer</strong><br>Selecione schema "loja" → Execute → Finish → o EER aparece!</div><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">tabela</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">fk_coluna</th><th style="background:#1565C0;color:#fff;padding:5px 9px;text-align:left">referencia</th></tr></thead><tbody><tr><td style="padding:5px 9px">produto</td><td style="padding:5px 9px;color:#1565C0;font-weight:600">id_categoria</td><td style="padding:5px 9px">categoria</td></tr></tbody></table></div>`},
+{label:"DER × EER — ciclo completo",
+narr:"<strong>Docente:</strong> \"Fechamos o ciclo: desenhamos o DER no draw.io na Aula 1, traduzimos para SQL agora, e o Workbench gerou o EER que é equivalente ao DER original. Na prática guiada vocês repetem esse processo completos.\"",
+code:`<span class="c">-- Ciclo completo da Aula 1 → Aula 2</span>
+
+<span class="c">-- draw.io (Aula 1):</span>
+<span class="c">-- CATEGORIA (1) ──────────── PRODUTO (N)</span>
+<span class="c">--   id_categoria    tem     id_produto</span>
+<span class="c">--   nome                    id_categoria ← FK</span>
+
+<span class="c">-- SQL (Aula 2):</span>
+<span class="k">CREATE TABLE</span> categoria ( id_categoria <span class="p">INT PK</span> ... );
+<span class="k">CREATE TABLE</span> produto (
+  id_produto   <span class="p">INT PK</span>,
+  id_categoria <span class="p">INT FK</span> → categoria,
+  ...
+);
+
+<span class="c">-- EER gerado pelo Workbench = DER original ✓</span>`,
+prev:`<div style="font-family:system-ui;padding:14px"><div style="font-size:12px;font-weight:600;color:#1565C0;margin-bottom:10px">Ciclo DER → SQL → EER completo</div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><div style="text-align:center;flex:1"><div style="font-size:32px">🗺️</div><div style="font-size:11px;font-weight:600;color:#1565C0;margin-top:4px">DER</div><div style="font-size:10px;color:#94a3b8">draw.io · Aula 1</div></div><div style="font-size:20px;color:#94a3b8">→</div><div style="text-align:center;flex:1"><div style="font-size:32px">💻</div><div style="font-size:11px;font-weight:600;color:#1565C0;margin-top:4px">SQL</div><div style="font-size:10px;color:#94a3b8">Workbench · Aula 2</div></div><div style="font-size:20px;color:#94a3b8">→</div><div style="text-align:center;flex:1"><div style="font-size:32px">🗺️</div><div style="font-size:11px;font-weight:600;color:#1565C0;margin-top:4px">EER</div><div style="font-size:10px;color:#94a3b8">Workbench gerou</div></div></div><div style="background:#e3f2fd;border-left:3px solid #1565C0;padding:9px 12px;font-size:12px;color:#0d3c6e;margin-top:10px"><strong>Próximo:</strong> prática guiada — você refaz o ciclo completo!</div></div>`}
+];
+let cur=0,typing=false,typeTimer=null;
+function render(){const s=STEPS[cur];document.getElementById('sbadge').textContent='Etapa '+(cur+1)+' / '+STEPS.length;document.getElementById('sdesc').textContent=s.label;document.getElementById('prog').style.width=Math.round(((cur+1)/STEPS.length)*100)+'%';document.getElementById('bp').disabled=cur===0;document.getElementById('bn').disabled=cur===STEPS.length-1;document.getElementById('narr').innerHTML=s.narr;document.getElementById('preview').innerHTML=s.prev||'';}
+function playS(){if(typing)return;typing=true;const s=STEPS[cur];const out=document.getElementById('code-out');out.innerHTML='';document.getElementById('bplay').disabled=true;document.getElementById('bp').disabled=true;document.getElementById('bn').disabled=true;const full=s.code;const parts=[];let i=0;while(i<full.length){if(full[i]==='<'){const end=full.indexOf('>',i);if(end!==-1){parts.push({type:'tag',val:full.slice(i,end+1)});i=end+1;continue;}}parts.push({type:'char',val:full[i]});i++;}let pi=0;function tick(){if(pi>=parts.length){typing=false;document.getElementById('bplay').textContent='Rever';document.getElementById('bplay').disabled=false;document.getElementById('bn').disabled=cur===STEPS.length-1;document.getElementById('bp').disabled=false;return;}const p=parts[pi];if(p.type==='tag'){out.innerHTML+=p.val;pi++;tick();return;}out.innerHTML+=p.val;pi++;typeTimer=setTimeout(tick,p.val==='\n'?55:p.val===' '?18:Math.random()*20+16);}tick();}
+function nextS(){if(typing){clearTimeout(typeTimer);typing=false;}cur=Math.min(cur+1,STEPS.length-1);render();document.getElementById('code-out').innerHTML=STEPS[cur].code;document.getElementById('bplay').textContent='Rever';document.getElementById('bplay').disabled=false;}
+function prevS(){if(typing){clearTimeout(typeTimer);typing=false;}cur=Math.max(cur-1,0);render();document.getElementById('code-out').innerHTML=STEPS[cur].code;document.getElementById('bplay').textContent='Rever';document.getElementById('bplay').disabled=false;}
+render();document.getElementById('code-out').innerHTML='';
+</script>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+</body>
+</html>

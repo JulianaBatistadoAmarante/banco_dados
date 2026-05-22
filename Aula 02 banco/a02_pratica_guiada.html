@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prática Guiada — Do DER ao SQL · Aula 02</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.pg-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.pg-title{font-size:17px;font-weight:600}.pg-meta{font-size:12px;color:#64748b;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pg-time{font-size:12px;font-weight:500;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 12px;border-radius:8px;color:#64748b}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #1565C0;color:#1565C0;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#e3f2fd}
+.prog-row{display:flex;align-items:center;gap:9px}
+.pb{flex:1;height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.pf{height:100%;background:#1565C0;border-radius:4px;transition:width .4s ease;width:0%}
+.pt{font-size:12px;font-weight:600;color:#64748b;min-width:60px;text-align:right}
+.sc{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;transition:border-color .2s}
+.sc.done-c{border-color:#86efac}.sc.open-c{border-color:#90caf9}
+.sh{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;cursor:pointer;user-select:none;transition:background .15s}
+.sh:hover{background:#f8fafc}.sc.open-c .sh{background:#e3f2fd}
+.chk{width:21px;height:21px;border-radius:6px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .18s;cursor:pointer;background:#fff}
+.chk:hover{border-color:#1565C0;background:#bbdefb}.chk.done{background:#22c55e;border-color:#22c55e}
+.chk svg{display:none}.chk.done svg{display:block}
+.si{flex:1}.sn2{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.st{font-size:13px;font-weight:600;color:#1e293b;line-height:1.3}.stm{font-size:11px;color:#94a3b8;margin-top:2px}
+.cv{color:#94a3b8;font-size:11px;margin-top:4px;transition:transform .22s;flex-shrink:0}
+.sc.open-c .cv{transform:rotate(180deg)}
+.sb{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.sc.open-c .sb{max-height:3000px}
+.sbi{padding:0 13px 14px;border-top:1px solid #f1f5f9}
+.il{display:flex;flex-direction:column;gap:6px;margin:11px 0}
+.ii{display:flex;gap:9px;font-size:13px;color:#475569;line-height:1.55;align-items:flex-start}
+.in{width:19px;height:19px;min-width:19px;border-radius:5px;background:#bbdefb;color:#1565C0;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cw{border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin:10px 0}
+.ch2{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:6px 12px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cdd{display:flex;gap:4px}.c1{width:9px;height:9px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:12px 15px;font-size:11.5px;line-height:1.8;overflow-x:auto;font-family:'Courier New',monospace;white-space:pre;margin:0}
+.k{color:#93c5fd}.p{color:#c4b5fd}.v{color:#6ee7b7}.s{color:#fda4af}.c{color:#475569;font-style:italic}
+.tip{background:#e3f2fd;border-left:3px solid #1565C0;padding:8px 12px;font-size:12px;color:#0d3c6e;line-height:1.5;margin-top:8px}
+.tip strong{color:#1565C0;font-weight:600}
+.mb{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;margin-top:10px}
+.mb:hover{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.mb.done-btn{background:#f0fdf4;color:#15803d;border-color:#86efac;pointer-events:none}
+.success-b{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center;display:none}
+.success-b.show{display:block}
+.success-b h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.success-b p{font-size:13px;color:#475569}
+.next-big{display:inline-flex;align-items:center;gap:7px;background:#1565C0;color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px;transition:background .15s}
+.next-big:hover{background:#0d47a1}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pg-header">
+    <div>
+      <div class="pg-title">Prática guiada — Do DER ao SQL no Workbench</div>
+      <div class="pg-meta">Use o DER que você criou na Aula 1 como guia. Siga os passos.</div>
+    </div>
+    <div class="header-right">
+      <span class="pg-time">90 min disponíveis</span>
+      <button class="next-stage" onclick="window.location.href='a02_desafio.html'">🎯 Desafio →</button>
+    </div>
+  </div>
+  <div class="prog-row"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt">0 / 6</div></div>
+  <div id="steps"></div>
+  <div class="success-b" id="success-el">
+    <h3>Banco loja criado com sucesso!</h3>
+    <p>Você mapeou o DER para SQL, criou as tabelas com FK, inseriu dados e gerou o EER.</p>
+    <button class="next-big" onclick="window.location.href='a02_desafio.html'">🎯 Ir para o Desafio →</button>
+  </div>
+</div>
+<div class="kz-footer">
+  <a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    @karizeviecelli
+  </a>
+  <span>·</span><span>© 2026</span>
+</div>
+<script>
+const STEPS=[
+{title:"Abrir o Workbench e conectar ao MySQL",time:"5 min",
+code:null,
+instrs:[
+  "Abra o <strong>MySQL Workbench</strong>. Na tela inicial clique na conexão <strong>Local instance MySQL</strong> (porta 3306)",
+  "Se pedir senha, insira a senha definida na instalação (padrão: root)",
+  "O editor SQL abre — você verá painéis: Navigator (esquerda), Editor (centro), Output (baixo)",
+  "Abra o arquivo do DER do draw.io que você criou na Aula 1 para ter como referência visual"
+],
+tip:"<strong>Sem conexão?</strong> Verifique se o serviço MySQL está rodando: Windows → Serviços → MySQL80 → Iniciar. Mac → System Preferences → MySQL → Start."},
+{title:"Criar o banco e a tabela categoria",time:"15 min",
+code:`<span class="k">CREATE DATABASE</span> loja;
+<span class="k">USE</span> loja;
+
+<span class="c">-- Entidade CATEGORIA do DER</span>
+<span class="k">CREATE TABLE</span> categoria (
+  id_categoria  <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  nome          <span class="p">VARCHAR</span>(<span class="s">80</span>)  <span class="v">NOT NULL</span>,
+  descricao     <span class="p">VARCHAR</span>(<span class="s">255</span>)
+);`,
+instrs:[
+  "No editor, digite o código ao lado e execute com <strong>Ctrl+Enter</strong> (linha a linha) ou <strong>Ctrl+Shift+Enter</strong> (tudo de uma vez)",
+  "No painel Navigator → Schemas, clique no ícone de atualizar (⟳) — o banco <strong>loja</strong> aparece",
+  "Expanda: loja → Tables → categoria — confira as colunas criadas",
+  "Dica: sempre verifique o Output (parte de baixo) — deve mostrar <strong>0 rows affected</strong> para CREATE"
+],
+tip:"<strong>Mapeamento aplicado:</strong> Entidade CATEGORIA → CREATE TABLE categoria. Atributo sublinhado (id_categoria) → INT AUTO_INCREMENT PRIMARY KEY. Atributo opcional (descricao) → sem NOT NULL."},
+{title:"Criar a tabela produto com FOREIGN KEY",time:"20 min",
+code:`<span class="c">-- Entidade PRODUTO + relacionamento 1:N com Categoria</span>
+<span class="k">CREATE TABLE</span> produto (
+  id_produto    <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  id_categoria  <span class="p">INT</span>           <span class="v">NOT NULL</span>,
+  nome          <span class="p">VARCHAR</span>(<span class="s">100</span>)  <span class="v">NOT NULL</span>,
+  preco         <span class="p">DECIMAL</span>(<span class="s">10,2</span>) <span class="v">NOT NULL</span>,
+  estoque       <span class="p">INT</span>           <span class="v">DEFAULT 0</span>,
+
+  <span class="v">FOREIGN KEY</span> (id_categoria)
+    <span class="v">REFERENCES</span> categoria(id_categoria)
+    <span class="v">ON DELETE RESTRICT</span>
+);`,
+instrs:[
+  "Digite o CREATE TABLE produto com a coluna <strong>id_categoria INT NOT NULL</strong> (a FK)",
+  "Adicione a cláusula <strong>FOREIGN KEY</strong> apontando para categoria(id_categoria)",
+  "Execute — verifique no Output que não há erros",
+  "No Navigator: expanda produto → <strong>Foreign Keys</strong> — deve aparecer a FK criada"
+],
+tip:"<strong>Por que DECIMAL(10,2) para preco?</strong> DECIMAL armazena exatamente 2 casas decimais sem erro de arredondamento. FLOAT pode gerar 49.89999 em vez de 49.90 — nunca use FLOAT para dinheiro."},
+{title:"Criar a tabela cliente e inserir dados",time:"20 min",
+code:`<span class="c">-- Entidade CLIENTE (independente)</span>
+<span class="k">CREATE TABLE</span> cliente (
+  id_cliente  <span class="p">INT</span>           <span class="v">AUTO_INCREMENT PRIMARY KEY</span>,
+  nome        <span class="p">VARCHAR</span>(<span class="s">120</span>)  <span class="v">NOT NULL</span>,
+  email       <span class="p">VARCHAR</span>(<span class="s">120</span>)  <span class="v">UNIQUE NOT NULL</span>,
+  telefone    <span class="p">VARCHAR</span>(<span class="s">20</span>)
+);
+
+<span class="c">-- Inserir: pai antes do filho!</span>
+<span class="k">INSERT INTO</span> categoria (nome) <span class="k">VALUES</span>
+  (<span class="s">'Roupas'</span>), (<span class="s">'Calçados'</span>), (<span class="s">'Acessórios'</span>);
+
+<span class="k">INSERT INTO</span> produto (id_categoria, nome, preco, estoque)
+<span class="k">VALUES</span>
+  (<span class="v">1</span>, <span class="s">'Camiseta Azul'</span>,   <span class="v">49.90</span>,  <span class="v">100</span>),
+  (<span class="v">1</span>, <span class="s">'Calça Jeans'</span>,    <span class="v">129.90</span>,  <span class="v">45</span>),
+  (<span class="v">2</span>, <span class="s">'Tênis Branco'</span>,  <span class="v">219.90</span>,  <span class="v">30</span>);`,
+instrs:[
+  "Crie a tabela cliente — sem FK por enquanto",
+  "Insira categorias <strong>primeiro</strong> (tabela pai). Execute e confira 3 linhas no Output",
+  "Insira os produtos referenciando id_categoria correto",
+  "Execute <code>SELECT * FROM produto;</code> para confirmar os dados"
+],
+tip:"<strong>Ordem obrigatória:</strong> sempre inserir na tabela pai antes da filha. A FK verifica se o id_categoria informado existe em categoria. Se não existir → Error 1452."},
+{title:"SELECT com WHERE e ORDER BY",time:"15 min",
+code:`<span class="c">-- Consultar tudo</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> produto;
+
+<span class="c">-- Filtrar por categoria</span>
+<span class="k">SELECT</span> nome, preco <span class="k">FROM</span> produto
+<span class="k">WHERE</span> id_categoria = <span class="v">1</span>;
+
+<span class="c">-- Ordenar por preço crescente</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> produto
+<span class="k">ORDER BY</span> preco <span class="v">ASC</span>;
+
+<span class="c">-- Testar a integridade da FK</span>
+<span class="k">INSERT INTO</span> produto (id_categoria, nome, preco)
+<span class="k">VALUES</span> (<span class="v">99</span>, <span class="s">'Teste'</span>, <span class="v">0</span>);
+<span class="c">-- Deve gerar: Error 1452</span>`,
+instrs:[
+  "Execute cada SELECT separadamente — coloque o cursor na linha e use <strong>Ctrl+Enter</strong>",
+  "Observe o grid de resultados no painel inferior do Workbench",
+  "Execute o INSERT com id_categoria = 99 e observe o <strong>Error 1452</strong> no Output",
+  "Esse erro confirma que a FK está funcionando — o banco protege a integridade"
+],
+tip:"<strong>Ctrl+Enter no Workbench</strong> executa apenas a instrução onde o cursor está. Ctrl+Shift+Enter executa tudo no editor. Use Ctrl+Enter para testar instrução por instrução."},
+{title:"Gerar o EER com Reverse Engineer",time:"15 min",
+code:null,
+instrs:[
+  "No menu do Workbench: <strong>Database → Reverse Engineer...</strong>",
+  "Na tela de conexão, clique <strong>Next</strong> (usa a conexão atual)",
+  "Na lista de schemas, marque <strong>loja</strong> → Next → Next → Execute → Next → Finish",
+  "O diagrama EER aparece — compare com o DER que você fez no draw.io na Aula 1. Devem ser equivalentes!"
+],
+tip:"<strong>Sem linha entre as tabelas?</strong> Significa que a FOREIGN KEY não foi declarada corretamente. Volte ao editor, confira o CREATE TABLE produto e verifique a cláusula FOREIGN KEY. No EER, as linhas aparecem apenas onde há FK declarada."}
+];
+let done=new Set();
+function build(){const list=document.getElementById('steps');STEPS.forEach((s,i)=>{const card=document.createElement('div');card.className='sc'+(i===0?' open-c':'');card.id='sc-'+i;let cblock='';if(s.code){cblock=`<div class="cw"><div class="ch2"><span>SQL — copie para o Workbench</span><div class="cdd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div><pre>${s.code}</pre></div>`;}card.innerHTML=`<div class="sh" onclick="tog(${i})"><div class="chk" id="chk-${i}" onclick="event.stopPropagation();mk(${i})"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="si"><div class="sn2">Passo ${i+1} de ${STEPS.length}</div><div class="st">${s.title}</div><div class="stm">${s.time}</div></div><span class="cv">${i===0?'▲':'▼'}</span></div><div class="sb"><div class="sbi">${cblock}<div class="il">${s.instrs.map((t,j)=>`<div class="ii"><div class="in">${j+1}</div><span>${t}</span></div>`).join('')}</div><div class="tip">${s.tip}</div><button class="mb" id="mb-${i}" onclick="mk(${i})"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Marcar como concluído</button></div></div>`;list.appendChild(card);});}
+function tog(i){const c=document.getElementById('sc-'+i);const o=c.classList.contains('open-c');document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').textContent='▼';});if(!o){c.classList.add('open-c');c.querySelector('.cv').textContent='▲';}}
+function mk(i){if(done.has(i))return;done.add(i);document.getElementById('chk-'+i).classList.add('done');document.getElementById('sc-'+i).classList.add('done-c');const mb=document.getElementById('mb-'+i);mb.classList.add('done-btn');mb.innerHTML='<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Concluído!';upd();if(i<STEPS.length-1){document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').textContent='▼';});const nx=document.getElementById('sc-'+(i+1));nx.classList.add('open-c');nx.querySelector('.cv').textContent='▲';setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'nearest'}),100);}if(done.size===STEPS.length)document.getElementById('success-el').classList.add('show');}
+function upd(){document.getElementById('pf').style.width=Math.round((done.size/STEPS.length)*100)+'%';document.getElementById('pt').textContent=done.size+' / '+STEPS.length;}
+build();upd();
+</script>
+</body>
+</html>
