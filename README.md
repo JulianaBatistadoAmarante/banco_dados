@@ -1,7 +1,7 @@
 # Plano de Ensino — Banco de Dados para Iniciantes
 
 **Docente:** Karize Viecelli  
-**Carga horária total:** 24 horas (6 aulas × 4 horas)  
+**Carga horária total:** 28 horas (7 aulas × 4 horas)  
 **Tema integrador:** Sistema de loja  
 **Ferramentas:** MySQL Workbench · draw.io · MongoDB Atlas · MongoDB Compass  
 
