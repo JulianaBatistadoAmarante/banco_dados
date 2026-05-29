@@ -39,7 +39,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ## Estrutura das Aulas
 
 ### Aula 01 — Conceitos de BD, UML, Cardinalidade e DER
-**Paleta:** Azul · `#1565C0`
+
 
 **Conteúdo:**
 - O que é um banco de dados e para que serve
@@ -58,7 +58,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 02 — Do DER ao SQL no Workbench
-**Paleta:** Azul · `#1565C0`
+
 
 **Conteúdo:**
 - Mapeamento DER → tabelas SQL
@@ -77,7 +77,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 03 — Do DER ao SQL: Criando o banco no Workbench
-**Paleta:** Azul · `#1565C0`  
+
 **Pré-requisito:** DER concluído na Aula 02
 
 **Conteúdo:**
@@ -100,7 +100,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 04 — Consultando dados: SELECT avançado e INNER JOIN
-**Paleta:** Verde · `#15803d`  
+ 
 **Pré-requisito:** Banco `loja` criado e populado
 
 **Conteúdo:**
@@ -122,7 +122,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 05 — SQL na prática: UPDATE, DELETE e consultas combinadas
-**Paleta:** Verde · `#15803d`  
+
 **Pré-requisito:** SELECT e JOIN dominados
 
 **Conteúdo:**
@@ -142,7 +142,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 06 — Introdução ao NoSQL e MongoDB
-**Paleta:** Roxo · `#6b21a8`  
+
 **Pré-requisito:** SQL relacional consolidado
 
 **Conteúdo:**
@@ -164,7 +164,7 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 ---
 
 ### Aula 07 — Projeto Integrador + Relacional vs NoSQL
-**Paleta:** Azul · `#1565C0` (fecha o ciclo)  
+
 **Pré-requisito:** Todas as aulas anteriores
 
 **Conteúdo:**
