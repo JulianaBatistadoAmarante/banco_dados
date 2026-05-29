@@ -76,122 +76,163 @@ Capacitar os alunos a modelar, implementar e consultar bancos de dados relaciona
 
 ---
 
-### Aula 03 — SELECT com INNER JOIN, GROUP BY e Agregação
-**Paleta:** Verde · `#15803d`
+### Aula 03 — Do DER ao SQL: Criando o banco no Workbench
+**Paleta:** Azul · `#1565C0`  
+**Pré-requisito:** DER concluído na Aula 02
 
 **Conteúdo:**
-- Por que precisamos de JOIN (problema do id_categoria numérico)
-- INNER JOIN com aliases (p, c)
-- Resultado do JOIN — linhas combinadas
-- GROUP BY — agrupar para resumir
-- COUNT, SUM, AVG, MIN, MAX
-- HAVING — filtrar grupos após agrupamento
-- WHERE vs HAVING — momentos diferentes da execução
-- Ordem de execução real do SQL: FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+- Revisão rápida: o DER da loja (Produto, Categoria, Cliente)
+- Mapeamento DER → tabelas SQL: cada entidade vira uma tabela
+- Tipos de dados: INT, VARCHAR, DECIMAL(10,2), DATE, TINYINT(1)
+- CREATE DATABASE e USE
+- CREATE TABLE com PRIMARY KEY e AUTO_INCREMENT
+- FOREIGN KEY: declaração, referência e ON DELETE
+- INSERT INTO na ordem correta (pai antes do filho)
+- SELECT básico, WHERE, ORDER BY
+- EER no Workbench via Database → Reverse Engineer
 
 **Ferramentas:** MySQL Workbench
 
-**Desafio:** 8 queries analíticas — relatórios de estoque por categoria
+**Desafio:** Criar do zero o banco `loja` com 3 tabelas (categoria, produto, cliente), inserir dados e gerar o EER
+
+**Entregável:** Script SQL funcionando + screenshot do EER
 
 ---
 
-### Aula 04 — Introdução ao NoSQL e MongoDB
-**Paleta:** Roxo · `#6b21a8`
+### Aula 04 — Consultando dados: SELECT avançado e INNER JOIN
+**Paleta:** Verde · `#15803d`  
+**Pré-requisito:** Banco `loja` criado e populado
 
 **Conteúdo:**
-- O que é NoSQL — "Not Only SQL"
-- Comparativo SQL vs NoSQL (estrutura, schema, escala, transações)
+- Revisão: SELECT, WHERE, ORDER BY, LIMIT
+- Por que precisamos de JOIN (problema do id_categoria numérico)
+- INNER JOIN com aliases (p, c)
+- LEFT JOIN — retornar todos mesmo sem correspondência
+- JOIN com WHERE — filtrar dentro do join
+- GROUP BY — agrupar linhas pelo mesmo valor
+- COUNT, SUM, AVG, MIN, MAX
+- HAVING — filtrar grupos após o agrupamento
+- WHERE vs HAVING — momentos diferentes da execução
+- Ordem de execução real: FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+
+**Ferramentas:** MySQL Workbench
+
+**Desafio:** 8 queries analíticas — relatórios de estoque e vendas por categoria
+
+---
+
+### Aula 05 — SQL na prática: UPDATE, DELETE e consultas combinadas
+**Paleta:** Verde · `#15803d`  
+**Pré-requisito:** SELECT e JOIN dominados
+
+**Conteúdo:**
+- UPDATE com WHERE (e o risco de esquecer o WHERE)
+- DELETE com WHERE (e o risco de esquecer o WHERE)
+- Transações básicas: START TRANSACTION, COMMIT, ROLLBACK
+- BETWEEN, IN, LIKE, IS NULL
+- Subconsulta simples no WHERE (SELECT dentro de SELECT)
+- CASE WHEN — lógica condicional no SELECT
+- Criação de VIEW simples
+- Boas práticas: backup antes de UPDATE/DELETE, teste com SELECT primeiro
+
+**Ferramentas:** MySQL Workbench
+
+**Desafio:** Atualizar preços de uma categoria, remover registros com critério, criar uma VIEW de relatório
+
+---
+
+### Aula 06 — Introdução ao NoSQL e MongoDB
+**Paleta:** Roxo · `#6b21a8`  
+**Pré-requisito:** SQL relacional consolidado
+
+**Conteúdo:**
+- O que é NoSQL — "Not Only SQL" — quando SQL não é suficiente
+- Comparativo SQL vs NoSQL: estrutura, schema, escala, transações
 - MongoDB — banco de documentos JSON/BSON
 - Hierarquia: Database → Collection → Document → Field
 - _id — chave primária automática (ObjectId)
-- CRUD: insertOne, insertMany, find, updateOne ($set, $inc), deleteOne
+- Schema flexível: documentos da mesma coleção com campos diferentes
+- CRUD: insertOne, insertMany, find(), updateOne ($set, $inc), deleteOne
 - Embedding vs Referência — quando usar cada abordagem
-- Operadores de filtro: $gt, $lt, $gte, $lte, $in, $ne
-- Projeção em find()
+- Operadores de filtro: $gt, $lt, $gte, $in, $exists, $regex
+- Projeção em find(), sort(), limit()
 
 **Ferramentas:** MongoDB Atlas (cloud gratuito) + MongoDB Compass
 
-**Desafio:** Criar banco loja_mongo com 5+ produtos, CRUD completo
+**Desafio:** Criar banco `loja_mongo`, inserir 5+ produtos com estruturas diferentes, CRUD completo
 
 ---
 
-### Aula 05 — Consultas MongoDB e Pipeline de Agregação
-**Paleta:** Laranja · `#c2410c`
+### Aula 07 — Projeto Integrador + Relacional vs NoSQL
+**Paleta:** Azul · `#1565C0` (fecha o ciclo)  
+**Pré-requisito:** Todas as aulas anteriores
 
 **Conteúdo:**
-- Operadores avançados: $exists, $regex, $and, $or, $not
-- Pipeline de agregação — sequência de estágios
-- $match (equivale ao WHERE)
-- $group com $sum, $avg, $min, $max (equivale ao GROUP BY)
-- $addFields — campos calculados
-- $project — projeção de campos (1=incluir, 0=excluir)
-- $sort e $limit — ordenação e paginação
-- $lookup — equivalente ao JOIN entre coleções
-- $unwind — "explodir" arrays
-- createIndex — otimizar consultas
-- Paralelo SQL × MongoDB lado a lado
-
-**Ferramentas:** MongoDB Atlas + Compass
-
-**Desafio:** Pipeline aggregate equivalente às queries SQL da Aula 03
-
----
-
-### Aula 06 — Relacional vs NoSQL e Projeto Integrador
-**Paleta:** Azul · `#1565C0` (fecha o ciclo)
-
-**Conteúdo:**
-- Revisão SQL: DER → FK → JOIN → GROUP BY → EER
-- Revisão MongoDB: embedding → find → aggregate
-- Comparativo prático: mesma pergunta nos dois bancos
+- Pipeline de agregação MongoDB: $match, $group, $sort, $project
+- Paralelo SQL × MongoDB: mesma consulta nos dois bancos
 - Critérios de decisão: quando usar MySQL vs MongoDB
-- Casos de uso reais: ERP, catálogo, logs, IoT, sistemas financeiros
+- Casos reais: ERP, catálogo, logs, IoT, sistemas financeiros
+- Orientações para o projeto integrador
+- Tempo dedicado para desenvolvimento + apresentações
 
 **Projeto Integrador — Entrega Final:**
 
 | Item | Descrição |
 |------|-----------|
 | DER | Mínimo 5 entidades, crow's foot, cardinalidade correta, exportado como PNG |
-| SQL | CREATE TABLE com PKs e FKs, INSERT na ordem correta, 2 queries INNER JOIN, 1 GROUP BY + agregação, EER gerado via Reverse Engineer |
-| Comparativo | 1 página: escolha MySQL ou MongoDB para o sistema modelado, 3 justificativas técnicas, 2 benefícios de negócio |
+| SQL | CREATE TABLE com PKs e FKs, INSERT, 2 queries INNER JOIN, 1 GROUP BY + agregação, EER via Reverse Engineer |
+| Comparativo | 1 página: escolha MySQL ou MongoDB, 3 justificativas técnicas, 2 benefícios de negócio |
 | Apresentação oral | 5 minutos: contexto → DER → SQL ao vivo → MongoDB → comparativo → perguntas |
-| Bônus | MongoDB: insertMany com 3+ documentos + aggregate equivalente a uma query SQL |
+| Bônus | MongoDB: insertMany + aggregate equivalente a uma query SQL |
+
+**Ferramentas:** draw.io + MySQL Workbench + MongoDB Atlas + Compass
 
 ---
 
-## Critérios de Avaliação
+## Progressão de Complexidade
+
+```
+Aula 01  Conceitos e vocabulário ─────────────────────── base
+Aula 02  Cardinalidade + DER + exercício ────────────── modelagem 
+Aula 03  DER → SQL + CREATE TABLE + INSERT ──────────── implementação
+Aula 04  SELECT + INNER JOIN + GROUP BY + HAVING ─────── consulta analítica
+Aula 05  UPDATE + DELETE + subconsultas + VIEW ───────── manutenção de dados
+Aula 06  NoSQL + MongoDB + CRUD + embedding ──────────── novo paradigma
+Aula 07  Agregação MongoDB + comparativo + projeto ───── integração e entrega
+```
+
+---
+
+## Critérios de Avaliação — Projeto Final
 
 | Critério | Peso |
 |---------|------|
-| DER correto (entidades, FKs, cardinalidade) | 20% |
-| SQL funcional (tabelas + queries) | 25% |
+| DER correto (entidades, FKs, cardinalidade, crow's foot) | 20% |
+| SQL funcional (tabelas criadas, dados inseridos, queries corretas) | 25% |
 | EER gerado bate com o DER | 10% |
 | Comparativo fundamentado tecnicamente | 25% |
-| Apresentação oral clara e objetiva | 20% |
+| Apresentação oral clara e objetiva (5 min) | 20% |
 
 ---
 
-## Recursos por Aula
-
-Cada aula possui 5 arquivos HTML interativos:
+## Materiais por Aula (5 arquivos HTML interativos)
 
 | Arquivo | Uso | Duração |
 |---------|-----|---------|
-| `a0X_exposicao.html` | Slides interativos para projetor — 9 slides com quiz | 45 min |
-| `a0X_demo_ao_vivo.html` | Digitação animada passo a passo — docente digita, turma acompanha | 30 min |
+| `a0X_exposicao.html` | Slides para projetor — 9 slides + quiz | 45 min |
+| `a0X_demo_ao_vivo.html` | Digitação animada — docente digita, turma acompanha | 30 min |
 | `a0X_pratica_guiada.html` | Roteiro passo a passo com gabarito colapsável | 90 min |
 | `a0X_desafio.html` | Checklist de requisitos + cronômetro 45 min | 45 min |
 | `a0X_feedback.html` | Painel de apresentações com notas, critérios e pontos de discussão | 30 min |
 
 ---
 
-## Referências e Próximos Passos
+## Referências
 
 - **MySQL:** dev.mysql.com/doc
-- **MongoDB:** mongodb.com/docs
-- **draw.io:** app.diagrams.net
-- **Certificações gratuitas:** MySQL OCA · MongoDB University (M001, M103)
-- **Prática:** modelar um sistema pessoal (agenda, biblioteca, estoque) do zero
+- **MongoDB:** mongodb.com/docs · MongoDB University (gratuito)
+- **Modelagem:** draw.io (app.diagrams.net)
+- **Certificações gratuitas:** MySQL OCA · MongoDB M001
 
 ---
 
