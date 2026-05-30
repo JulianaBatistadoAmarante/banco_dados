@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pr&aacute;tica guiada &mdash; Introdu&ccedil;&atilde;o ao MongoDB</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ac:#6b21a8;--lt:#d8b4fe;--bg:#faf5ff;--dark:#3b0764}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.badge{background:#6b21a8;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pg-title{font-size:17px;font-weight:600}.pg-meta{font-size:12px;color:#64748b;margin-top:2px}
+.pg-time{font-size:12px;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 12px;border-radius:8px;color:#64748b}
+.next-a{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #6b21a8;color:#6b21a8;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none}
+.next-a:hover{background:#faf5ff}
+.prog-row{display:flex;align-items:center;gap:9px}
+.pb{flex:1;height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.pf{height:100%;background:#6b21a8;border-radius:4px;transition:width .4s;width:0%}
+.pt{font-size:12px;font-weight:600;color:#64748b;min-width:60px;text-align:right}
+.sc{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;transition:border-color .2s}
+.sc.done-c{border-color:#d8b4fe}.sc.open-c{border-color:#d8b4fe}
+.sh{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;cursor:pointer;user-select:none}
+.sh:hover{background:#f8fafc}.sc.open-c .sh{background:#faf5ff}
+.chk{width:21px;height:21px;border-radius:6px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;cursor:pointer;background:#fff;transition:all .18s}
+.chk:hover{border-color:#6b21a8;background:#d8b4fe}.chk.done{background:#22c55e;border-color:#22c55e}
+.chk svg{display:none}.chk.done svg{display:block}
+.si{flex:1}.sn2{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.st{font-size:13px;font-weight:600;color:#1e293b}.stm{font-size:11px;color:#94a3b8;margin-top:2px}
+.cv{color:#94a3b8;font-size:11px;margin-top:4px;transition:transform .22s;flex-shrink:0}
+.sc.open-c .cv{transform:rotate(180deg)}
+.sb{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.sc.open-c .sb{max-height:3000px}
+.sbi{padding:0 13px 14px;border-top:1px solid #f1f5f9}
+.il{display:flex;flex-direction:column;gap:6px;margin:11px 0}
+.ii{display:flex;gap:9px;font-size:13px;color:#475569;line-height:1.55;align-items:flex-start}
+.in{width:19px;height:19px;min-width:19px;border-radius:5px;background:#d8b4fe;color:#6b21a8;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.gab-wrap{margin:10px 0}
+.gab-btn{display:inline-flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.gab-btn:hover{background:#faf5ff;color:#6b21a8;border-color:#d8b4fe}
+.gab-btn .arr{transition:transform .2s;display:inline-block}
+.gab-btn.open .arr{transform:rotate(180deg)}
+.gab-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.gab-body.open{max-height:2000px}
+.cw{border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin:7px 0}
+.ch2{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:6px 12px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cdd{display:flex;gap:4px}.c1{width:9px;height:9px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:12px 15px;font-size:11.5px;line-height:1.8;overflow-x:auto;font-family:'Courier New',monospace;white-space:pre;margin:0}
+.tip{background:#faf5ff;border-left:3px solid #6b21a8;padding:8px 12px;font-size:12px;color:#3b0764;line-height:1.5;margin-top:8px}
+.tip strong{color:#6b21a8}
+.mb{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;margin-top:10px}
+.mb:hover{background:#faf5ff;color:#6b21a8;border-color:#d8b4fe}
+.mb.done-btn{background:#f0fdf4;color:#15803d;border-color:#86efac;pointer-events:none}
+.success-b{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center;display:none}
+.success-b.show{display:block}
+.success-b h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.next-big{display:inline-flex;align-items:center;gap:7px;background:#6b21a8;color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px}
+.brief{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.bt{background:#ede9fe;padding:17px 19px;border-bottom:1px solid #d8b4fe}
+.bbadge{font-size:11px;font-weight:600;background:#fff;color:#6b21a8;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px}
+.btitle{font-size:19px;font-weight:600;color:#3b0764;margin-bottom:3px}
+.bb{padding:15px 19px}
+.ctx{background:#faf5ff;border-radius:8px;padding:11px 13px;font-size:13px;color:#475569;line-height:1.6;margin-bottom:13px;border-left:3px solid #6b21a8}
+.ctx strong{color:#1e293b;font-weight:600;display:block;margin-bottom:3px}
+.cl{display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:flex-start;gap:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;color:#475569;line-height:1.5}
+.cd{width:5px;height:5px;min-width:5px;border-radius:50%;background:#6b21a8;flex-shrink:0;margin-top:5px}
+.tr{display:flex;align-items:center;gap:9px;border:1px solid #e2e8f0;border-radius:12px;padding:11px 15px;background:#fff;flex-wrap:wrap}
+.tn{font-size:26px;font-weight:500;font-family:'Courier New',monospace;color:#1e293b;min-width:80px}
+.ti{flex:1;min-width:130px}.ti p{font-size:12px;color:#64748b;margin-top:1px}
+.ti strong{font-size:13px;color:#1e293b;font-weight:600}
+.tb{font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #cbd5e1;background:#6b21a8;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.tb.reset{background:#fff;color:#64748b;border-color:#cbd5e1}.tb:disabled{opacity:.4;pointer-events:none}
+.ri2{display:flex;gap:9px;align-items:flex-start;margin-bottom:5px}
+.rc{width:19px;height:19px;min-width:19px;border-radius:5px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;background:#fff;transition:all .15s;flex-shrink:0}
+.rc:hover{border-color:#6b21a8;background:#d8b4fe}.rc.on{background:#22c55e;border-color:#22c55e}
+.rc svg{display:none}.rc.on svg{display:block}
+.rt{font-size:12.5px;color:#475569;line-height:1.5}.rt.done{color:#94a3b8;text-decoration:line-through}
+.pbarw{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:9px}
+.sb2{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center}
+.sb2.show{display:block}.sb2 h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.sb2 p{font-size:13px;color:#475569}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+/* feedback */
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px}
+.ttitle{font-size:17px;font-weight:600}.tmeta{font-size:12px;color:#64748b;margin-top:1px}
+.chip{font-size:13px;font-weight:500;padding:5px 13px;border-radius:20px;background:#d8b4fe;border:1px solid #d8b4fe;color:#6b21a8;font-family:'Courier New',monospace}
+.tbtn{font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.tbtn:hover{background:#f1f5f9}.tbtn.act{background:#6b21a8;color:#fff;border-color:#6b21a8}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:580px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px;text-align:center}
+.sn{font-size:23px;font-weight:500}.sl{font-size:11px;color:#64748b;margin-top:2px}
+.empty-state{background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;color:#94a3b8}
+.empty-state p{font-size:13px;margin-bottom:12px}
+.empty-btn{display:inline-flex;align-items:center;gap:6px;background:#6b21a8;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:8px}
+.ac{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ac.pres{border:2px solid #6b21a8}.ac.conc{border-color:#86efac}
+.at{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #f1f5f9}
+.del-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:15px;line-height:1;padding:2px 5px;border-radius:4px;margin-left:auto;flex-shrink:0;transition:color .15s}
+.del-btn:hover{color:#ef4444}
+.av{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.an{font-size:13px;font-weight:600;line-height:1.2}.as{font-size:11px;color:#94a3b8;margin-top:1px}
+.ab{padding:10px 12px}
+.stars{display:flex;gap:3px;margin-bottom:7px}
+.star{font-size:17px;cursor:pointer;color:#e2e8f0;user-select:none}.star.on{color:#f59e0b}
+.chks{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+.chk2{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
+.mc{width:13px;height:13px;border-radius:3px;border:1px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc.on{background:#22c55e;border-color:#22c55e}.mc svg{display:none}.mc.on svg{display:block}
+.note{width:100%;border:1px solid #e2e8f0;border-radius:5px;padding:5px 7px;font-size:11px;font-family:inherit;color:#1e293b;background:#fff;resize:none;outline:none}
+.note:focus{border-color:#6b21a8}
+.acts{display:flex;gap:5px;margin-top:7px}
+.act{flex:1;font-size:11px;padding:5px 4px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;font-family:inherit;text-align:center;transition:all .12s}
+.act:hover{background:#d8b4fe;color:#6b21a8;border-color:#d8b4fe}
+.act.pon{background:#d8b4fe;color:#6b21a8;border-color:#6b21a8}
+.act.don{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.col{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.colh{padding:11px 15px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:13px;font-weight:600;color:#475569}
+.colb{padding:13px 15px;display:flex;flex-direction:column;gap:7px}
+.pto{border:1px solid #e2e8f0;border-radius:7px;padding:9px 11px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:9px}
+.pto:hover{border-color:#d8b4fe;background:#faf5ff}.pto.used{border-color:#d8b4fe;background:#ede9fe}
+.pto-ic{width:23px;height:23px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.pto-tx{font-size:12px;color:#475569;line-height:1.5;flex:1}.pto.used .pto-tx{color:#3b0764}
+.pto-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;background:#fef3c7;color:#92400e;white-space:nowrap;flex-shrink:0}
+.pto.used .pto-tag{background:#d8b4fe;color:#6b21a8}
+.add-area{display:flex;gap:7px;padding:11px 15px;border-top:1px solid #e2e8f0}
+.add-area input{flex:1;border:1px solid #e2e8f0;border-radius:6px;padding:6px 9px;font-size:12px;font-family:inherit;color:#1e293b;background:#fff;outline:none}
+.add-area input:focus{border-color:#6b21a8}
+.add-area button{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #d8b4fe;background:#d8b4fe;color:#3b0764;cursor:pointer;font-family:inherit;font-weight:500}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head><body>
+<div class="wrap">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div><div class="pg-title">Pr&aacute;tica guiada &mdash; Introdu&ccedil;&atilde;o ao MongoDB</div><div class="pg-meta">Aula 06 &middot; Atlas + Compass</div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span class="pg-time">90 min</span>
+      <a class="next-a" href="a07_desafio.html">&#127919; Desafio &rarr;</a>
+    </div>
+  </div>
+  <div class="prog-row"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt">0 / 6</div></div>
+  <div id="steps"></div>
+  <div class="success-b" id="success-el">
+    <h3>Pr&#225;tica conclu&#237;da!</h3>
+    <button class="next-big" onclick="window.location.href='a07_desafio.html'">&#127919; Ir para o Desafio &rarr;</button>
+  </div>
+</div>
+<div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+<script>const STEPS=[
+{title:"Conectar ao Atlas e criar banco loja_mongo",time:"10 min",
+instrs:[
+  "Acesse cloud.mongodb.com &rarr; crie conta gratuita &rarr; deploy M0 Free &rarr; AWS S&atilde;o Paulo",
+  "Copie a Connection String e cole no MongoDB Compass em 'New Connection'",
+  "No shell ou Compass execute: use loja_mongo",
+  "Confirme: db.getName() deve retornar 'loja_mongo'"
+],
+code:`use loja_mongo\ndb.getName()        // 'loja_mongo'\ndb.getCollectionNames() // []`,
+tip:"<strong>O banco s&oacute; &eacute; criado de verdade</strong> quando o primeiro documento for inserido. use loja_mongo apenas seleciona o banco — ele aparece na lista depois do primeiro insertOne."},
+{title:"insertOne com embedding e array",time:"15 min",
+instrs:[
+  "Execute o insertOne e observe o _id gerado automaticamente",
+  "No Compass: v&aacute; em loja_mongo &rarr; produtos &mdash; o documento aparece",
+  "Clique no documento para ver o JSON completo",
+  "Observe que categoria &eacute; um objeto embutido e tamanhos &eacute; um array &mdash; imposs&iacute;vel em uma coluna SQL"
+],
+code:`db.produtos.insertOne({\n  nome:      "Camiseta Azul",\n  preco:     49.90,\n  estoque:   100,\n  categoria: { nome: "Roupas", codigo: "ROU" },\n  tags:      ["algodao", "casual"],\n  tamanhos:  ["P", "M", "G", "GG"]\n})`,
+tip:"<strong>Schema flex&iacute;vel:</strong> o MongoDB n&atilde;o exige que todos os documentos da mesma cole&ccedil;&atilde;o tenham os mesmos campos. O pr&oacute;ximo insertOne pode ter campos completamente diferentes."},
+{title:"insertMany — 3 produtos com estruturas diferentes",time:"15 min",
+instrs:[
+  "Execute o insertMany — observe que cada produto tem uma estrutura diferente",
+  "No Compass clique em Table View &mdash; campos ausentes aparecem como &mdash;",
+  "Execute db.produtos.countDocuments() &mdash; deve retornar 4",
+  "Observe que T&ecirc;nis tem campo 'numeracao' que Camiseta n&atilde;o tem"
+],
+code:`db.produtos.insertMany([\n  { nome: "Calca Jeans", preco: 129.90, estoque: 45,\n    categoria: { nome: "Roupas", codigo: "ROU" },\n    tamanhos: ["36","38","40","42"] },\n  { nome: "Tenis Branco", preco: 219.90, estoque: 30,\n    categoria: { nome: "Calcados", codigo: "CAL" },\n    numeracao: [38,39,40,41,42] },\n  { nome: "Bone Preto", preco: 39.90, estoque: 200,\n    categoria: { nome: "Acessorios", codigo: "ACE" },\n    ajuste: "snapback" }\n])`,
+tip:"<strong>Table View no Compass</strong> mostra a heterogeneidade dos documentos. Em SQL isso exigiria NULL em todas as linhas e ALTER TABLE para cada novo campo. No MongoDB &eacute; nativo."},
+{title:"find() com filtros e projeção",time:"15 min",
+instrs:[
+  "Execute cada find() separadamente e observe os resultados",
+  "'categoria.nome' com aspas acessa campo de documento embutido",
+  "Tente: db.produtos.find({ preco: { $gte: 40, $lte: 130 } })",
+  "Tente: db.produtos.find({ tags: 'casual' }) &mdash; filtra por elemento de array"
+],
+code:`// Todos\ndb.produtos.find()\n\n// Preco > 50\ndb.produtos.find({ preco: { $gt: 50 } })\n\n// Campo embutido\ndb.produtos.find({ "categoria.nome": "Roupas" })\n\n// Projecao: so nome e preco\ndb.produtos.find({}, { nome: 1, preco: 1, _id: 0 })`,
+tip:"<strong>Nota&ccedil;&atilde;o ponto</strong> 'categoria.nome' acessa campos de documentos embutidos. Operadores: $gt (&gt;), $gte (&gt;=), $lt (&lt;), $lte (&lt;=), $in (est&aacute; na lista), $ne (diferente)."},
+{title:"updateOne com $set e $inc",time:"15 min",
+instrs:[
+  "Execute o updateOne e depois findOne para confirmar a mudan&ccedil;a",
+  "$set atualiza s&oacute; os campos especificados &mdash; o resto fica intacto",
+  "$inc incrementa: estoque de T&ecirc;nis foi de 30 para 50",
+  "Tente sem $set (substitui&ccedil;&atilde;o direta) &mdash; o que acontece com os outros campos?"
+],
+code:`// Atualizar preco\ndb.produtos.updateOne(\n  { nome: "Camiseta Azul" },\n  { $set: { preco: 54.90, ativo: true } }\n)\n\n// Incrementar estoque\ndb.produtos.updateOne(\n  { nome: "Tenis Branco" },\n  { $inc: { estoque: 20 } }\n)\n\n// Confirmar\ndb.produtos.findOne({ nome: "Camiseta Azul" })`,
+tip:"<strong>NUNCA fa&ccedil;a updateOne(filtro, novoDoc)</strong> sem operadores &mdash; isso substitui o documento inteiro, apagando todos os outros campos. Sempre use $set, $inc, $push ou outros operadores para atualiza&ccedil;&otilde;es parciais."},
+{title:"deleteOne, sort e limit",time:"15 min",
+instrs:[
+  "Execute deleteOne e confirme com countDocuments",
+  "sort({ preco: 1 }) = ORDER BY preco ASC",
+  "sort({ preco: -1 }).limit(2) = ORDER BY preco DESC LIMIT 2",
+  "Combine: db.produtos.find({'categoria.nome':'Roupas'}).sort({preco:-1})"
+],
+code:`// Deletar\ndb.produtos.deleteOne({ nome: "Bone Preto" })\ndb.produtos.countDocuments() // 3\n\n// Ordenar crescente\ndb.produtos.find().sort({ preco: 1 })\n\n// Top 2 mais caros\ndb.produtos.find().sort({ preco: -1 }).limit(2)\n\n// Combinar filtro + sort\ndb.produtos.find(\n  { "categoria.nome": "Roupas" },\n  { nome: 1, preco: 1, _id: 0 }\n).sort({ preco: -1 })`,
+tip:"<strong>Cuidado com deleteMany({})!</strong> Sem filtro, remove TODOS os documentos. Equivale a DELETE FROM tabela sem WHERE. Sempre teste o filtro com find() antes de deletar."}
+];</script>
+<script>
+let done=new Set();
+function build(){
+  const list=document.getElementById('steps');
+  STEPS.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.className='sc'+(i===0?' open-c':'');
+    card.id='sc-'+i;
+    let gab='';
+    if(s.code){
+      gab=`<div class="gab-wrap">
+        <button class="gab-btn" id="gbtn-${i}" onclick="togGab(${i})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Ver gabarito <span class="arr">&#9662;</span>
+        </button>
+        <div class="gab-body" id="gab-${i}">
+          <div class="cw" style="margin-top:7px">
+            <div class="ch2"><span>Gabarito</span><div class="cdd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+            <pre>${s.code}</pre>
+          </div>
+        </div>
+      </div>`;
+    }
+    card.innerHTML=`<div class="sh" onclick="tog(${i})">
+      <div class="chk" id="chk-${i}" onclick="event.stopPropagation();mk(${i})">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="si"><div class="sn2">Passo ${i+1} de ${STEPS.length}</div><div class="st">${s.title}</div><div class="stm">${s.time}</div></div>
+      <span class="cv">${i===0?'&#9650;':'&#9660;'}</span>
+    </div>
+    <div class="sb"><div class="sbi">
+      <div class="il">${s.instrs.map((t,j)=>`<div class="ii"><div class="in">${j+1}</div><span>${t}</span></div>`).join('')}</div>
+      ${gab}
+      <div class="tip">${s.tip}</div>
+      <button class="mb" id="mb-${i}" onclick="mk(${i})">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Marcar como conclui&#769;do
+      </button>
+    </div></div>`;
+    list.appendChild(card);
+  });
+}
+function togGab(i){
+  document.getElementById('gbtn-'+i).classList.toggle('open');
+  document.getElementById('gab-'+i).classList.toggle('open');
+}
+function tog(i){
+  const c=document.getElementById('sc-'+i);
+  const o=c.classList.contains('open-c');
+  document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').innerHTML='&#9660;';});
+  if(!o){c.classList.add('open-c');c.querySelector('.cv').innerHTML='&#9650;';}
+}
+function mk(i){
+  if(done.has(i))return;
+  done.add(i);
+  document.getElementById('chk-'+i).classList.add('done');
+  document.getElementById('sc-'+i).classList.add('done-c');
+  const mb=document.getElementById('mb-'+i);
+  mb.classList.add('done-btn');
+  mb.innerHTML='<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Conclu&#237;do!';
+  upd();
+  if(i<STEPS.length-1){
+    document.querySelectorAll('.sc').forEach(x=>{x.classList.remove('open-c');x.querySelector('.cv').innerHTML='&#9660;';});
+    const nx=document.getElementById('sc-'+(i+1));
+    nx.classList.add('open-c');nx.querySelector('.cv').innerHTML='&#9650;';
+    setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+  }
+  if(done.size===STEPS.length)document.getElementById('success-el').classList.add('show');
+}
+function upd(){
+  document.getElementById('pf').style.width=Math.round((done.size/STEPS.length)*100)+'%';
+  document.getElementById('pt').textContent=done.size+' / '+STEPS.length;
+}
+build();upd();
+</script>
+</body></html>

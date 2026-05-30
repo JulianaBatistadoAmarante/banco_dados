@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exposi&#231;&#227;o &mdash; Introdução ao MongoDB &middot; Aula 06</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;gap:8px;flex-wrap:wrap;min-height:52px}
+.badge{background:#6b21a8;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.hdr-title{font-size:14px;font-weight:600}.hdr-sub{font-size:12px;color:#94a3b8;margin-top:1px}
+.timer{font-size:13px;font-weight:500;background:#f1f5f9;padding:5px 14px;border-radius:8px;border:1px solid #e2e8f0;font-family:monospace;color:#475569;min-width:64px;text-align:center}
+.timer.warn{color:#d97706;background:#fffbeb}.timer.danger{color:#dc2626;background:#fef2f2}
+.dots{display:flex;align-items:center;gap:5px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;overflow-x:auto}
+.dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;cursor:pointer;transition:all .2s;flex-shrink:0}
+.dot.active{background:#6b21a8;transform:scale(1.4)}.dot.done{background:#6b21a8;opacity:.4}
+.dsep{width:10px;height:1px;background:#e2e8f0;flex-shrink:0}
+.slide-area{flex:1;overflow-y:auto;padding:22px 28px}
+.slide{display:none}.slide.active{display:block;animation:sIn .22s ease}
+@keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ey{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6b21a8;margin-bottom:5px}
+.stitle{font-size:21px;font-weight:600;color:#1e293b;line-height:1.2;margin-bottom:5px}
+.ssub{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px}
+.card.ac{border-left:3px solid #6b21a8}
+.ci{font-size:18px;margin-bottom:5px}.ct{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:3px}
+.cb{font-size:12px;color:#64748b;line-height:1.5}
+.cw{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin:10px 0}
+.ch{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:7px 13px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:13px 16px;font-size:12px;line-height:1.8;overflow-x:auto;font-family:monospace;white-space:pre;margin:0}
+.hl{background:#faf5ff;border-left:3px solid #6b21a8;padding:10px 13px;font-size:12.5px;color:#3b0764;line-height:1.55;margin:10px 0}
+.hl strong{color:#6b21a8}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+.qb{margin-bottom:16px}.qa{font-size:13.5px;font-weight:600;color:#1e293b;margin-bottom:11px;line-height:1.5}
+.qo{display:flex;flex-direction:column;gap:7px}
+.qop{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s;color:#1e293b}
+.qop:hover:not(.correct):not(.wrong):not(.dimmed){border-color:#6b21a8;background:#faf5ff}
+.qop.correct{background:#f0fdf4;border-color:#86efac;color:#15803d;pointer-events:none}
+.qop.wrong{background:#fef2f2;border-color:#fca5a5;color:#dc2626;pointer-events:none}
+.qop.dimmed{opacity:.4;pointer-events:none}
+.qfb{margin-top:9px;padding:9px 13px;border-radius:8px;font-size:12.5px;line-height:1.5;display:none}
+.rl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ri{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px 13px}
+.rn{width:23px;height:23px;min-width:23px;border-radius:6px;background:#d8b4fe;color:#6b21a8;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rt{font-size:13px;color:#64748b;line-height:1.55}.rt strong{color:#1e293b;font-weight:600}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.comp-table thead tr th{background:#6b21a8;color:#fff;padding:7px 10px;text-align:left;font-weight:600}
+.comp-table tbody tr td{padding:7px 10px;border-bottom:1px solid #e2e8f0;color:#475569;vertical-align:top}
+.comp-table tbody tr:nth-child(even){background:#f8fafc}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.rtbl thead tr th{background:#6b21a8;color:#fff;padding:6px 10px;text-align:left}
+.rtbl tbody tr td{padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#475569}
+.rtbl tbody tr:nth-child(even){background:#f8fafc}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-top:1px solid #e2e8f0;background:#fff;flex-shrink:0}
+.nb{background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;padding:7px 17px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.nb:hover{background:#e2e8f0}.nb.pr{background:#6b21a8;color:#fff;border-color:#6b21a8}
+.nb:disabled{opacity:.35;pointer-events:none}.nc{font-size:12px;color:#94a3b8}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #6b21a8;color:#6b21a8;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#faf5ff}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:11px">
+      <span class="badge">Aula 06</span>
+      <div><div class="hdr-title">Introdução ao MongoDB &mdash; Exposi&#231;&#227;o Dialogada</div>
+      <div class="hdr-sub">45 minutos &middot; Projetor &middot; Turma</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div class="timer" id="timer">45:00</div>
+      <button class="next-stage" onclick="window.location.href='a06_demo_ao_vivo.html'">&#128187; Demo &rarr;</button>
+    </div>
+  </div>
+  <div class="dots" id="dots-bar"></div>
+  <div class="slide-area" id="slide-area"></div>
+  <div class="nav">
+    <button class="nb" id="btn-prev" onclick="goNav(-1)" disabled>&#8592; Anterior</button>
+    <span class="nc" id="counter">1 / 8</span>
+    <button class="nb pr" id="btn-next" onclick="goNav(1)">Pr&#243;ximo &#8594;</button>
+  </div>
+  <div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+</div>
+<script>
+var SLIDES=[
+function(){return ["<div class=\"ey\">Abertura &middot; 3 min</div>","<div class=\"stitle\">E se os dados não coubessem em tabelas?</div>","<div class=\"ssub\">Nas últimas 4 aulas trabalhamos com dados bem estruturados. Mas nem sempre os dados têm essa forma — às vezes são hierárquicos, variáveis ou chegam em formatos diferentes.</div>","<div class=\"cards\">","<div class=\"card ac\"><div class=\"ci\">&#128241;</div><div class=\"ct\">Dados flex&iacute;veis</div><div class=\"cb\">Um produto pode ter 3 atributos ou 30. Uma TV tem polegadas; uma camiseta tem tamanho e cor. Tabelas fixas precisam de workarounds.</div></div>","<div class=\"card ac\"><div class=\"ci\">&#128640;</div><div class=\"ct\">Escala horizontal</div><div class=\"cb\">SQL escala verticalmente (servidor mais potente). MongoDB escala horizontalmente (mais servidores). Pense em Netflix e Twitter.</div></div>","<div class=\"card\"><div class=\"ci\">&#128172;</div><div class=\"ct\">Pergunta de abertura</div><div class=\"cb\"><em>\"Se você fosse guardar um produto com uma lista variável de tags, como modelaria isso em SQL? E se cada produto tivesse atributos diferentes?\"</em></div></div>","<div class=\"card\"><div class=\"ci\">&#127919;</div><div class=\"ct\">O que veremos</div><div class=\"cb\">O que é NoSQL, MongoDB, coleções, documentos JSON, CRUD básico, embedding vs referência.</div></div>","</div>"].join('');},
+function(){return ["<div class=\"ey\">SQL vs NoSQL &middot; 4 min</div>","<div class=\"stitle\">SQL vs NoSQL — uma escolha, não uma batalha</div>","<table class=\"comp-table\"><thead><tr><th>Aspecto</th><th>SQL (MySQL)</th><th>NoSQL (MongoDB)</th></tr></thead>","<tbody>","<tr><td><strong>Estrutura</strong></td><td>Tabelas fixas com schema definido</td><td>Documentos JSON flex&iacute;veis</td></tr>","<tr><td><strong>Schema</strong></td><td>Obrigat&oacute;rio antes de inserir</td><td>Opcional &mdash; cada doc pode ser diferente</td></tr>","<tr><td><strong>Relacionamentos</strong></td><td>JOIN entre tabelas com FK</td><td>Embedding ou refer&ecirc;ncia manual</td></tr>","<tr><td><strong>Escala</strong></td><td>Vertical (mais RAM/CPU)</td><td>Horizontal (mais servidores)</td></tr>","<tr><td><strong>Ideal para</strong></td><td>ERP, financeiro, e-commerce estruturado</td><td>Cat&aacute;logos, logs, IoT, redes sociais</td></tr>","</tbody></table>"].join('');},
+function(){return ["<div class=\"ey\">Documento JSON &middot; 4 min</div>","<div class=\"stitle\">MongoDB armazena documentos JSON</div>","<div class=\"two-col\">","<div style=\"border:1px solid #e2e8f0;border-radius:10px;overflow:hidden\"><div style=\"padding:8px 13px;font-size:12px;font-weight:600;background:#fef2f2;color:#991b1b\">SQL &mdash; tabela produto</div>","<div style=\"padding:10px;font-size:11px;font-family:monospace;color:#475569\">","<table style=\"width:100%;border-collapse:collapse\"><thead><tr>","<th style=\"background:#e2e8f0;padding:4px 7px\">id</th><th style=\"background:#e2e8f0;padding:4px 7px\">nome</th><th style=\"background:#e2e8f0;padding:4px 7px\">id_cat</th>","</tr></thead><tbody><tr>","<td style=\"padding:4px 7px;border-bottom:1px solid #f1f5f9\">1</td><td style=\"padding:4px 7px;border-bottom:1px solid #f1f5f9\">Camiseta</td><td style=\"padding:4px 7px\">1</td>","</tr></tbody></table></div></div>","<div style=\"border:1px solid #e2e8f0;border-radius:10px;overflow:hidden\"><div style=\"padding:8px 13px;font-size:12px;font-weight:600;background:#f0fdf4;color:#15803d\">MongoDB &mdash; documento</div>","<pre style=\"font-size:11px;padding:10px\">{\n  \"_id\": ObjectId(\"...\"),\n  \"nome\": \"Camiseta Azul\",\n  \"preco\": 49.90,\n  \"categoria\": \"Roupas\",\n  \"tags\": [\"algodao\",\"casual\"],\n  \"tamanhos\": [\"P\",\"M\",\"G\"]\n}</pre></div>","</div>","<div class=\"hl\"><strong>_id</strong> é a chave primária automática — um ObjectId de 24 caracteres hex, único e gerado automaticamente.</div>"].join('');},
+function(){return ["<div class=\"ey\">Hierarquia &middot; 3 min</div>","<div class=\"stitle\">Database &rarr; Collection &rarr; Document</div>","<table class=\"comp-table\"><thead><tr><th>MongoDB</th><th>Equivalente SQL</th><th>Descri&#231;&#227;o</th></tr></thead>","<tbody>","<tr><td><strong>Database</strong></td><td>Schema</td><td>Conjunto de cole&ccedil;&otilde;es relacionadas</td></tr>","<tr><td><strong>Collection</strong></td><td>Tabela</td><td>Grupo de documentos (sem schema fixo)</td></tr>","<tr><td><strong>Document</strong></td><td>Linha</td><td>Objeto JSON com campos vari&aacute;veis</td></tr>","<tr><td><strong>Field</strong></td><td>Coluna</td><td>Chave-valor dentro do documento</td></tr>","<tr><td><strong>_id</strong></td><td>PRIMARY KEY</td><td>Identificador &uacute;nico do documento</td></tr>","</tbody></table>"].join('');},
+function(){return ["<div class=\"ey\">CRUD &middot; 5 min</div>","<div class=\"stitle\">Operações CRUD no MongoDB</div>","<div class=\"cw\"><div class=\"ch\"><span>MongoDB Shell &mdash; CRUD b&aacute;sico</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>// CREATE\ndb.produtos.insertOne({\n  nome: \"Camiseta Azul\", preco: 49.90,\n  categoria: { nome: \"Roupas\" }\n})\n\n// READ\ndb.produtos.find({ preco: { $gt: 50 } })\n\n// UPDATE\ndb.produtos.updateOne(\n  { nome: \"Camiseta Azul\" },\n  { $set: { preco: 54.90 } }\n)\n\n// DELETE\ndb.produtos.deleteOne({ nome: \"Camiseta Azul\" })</pre></div>"].join('');},
+function(){return ["<div class=\"ey\">Embedding &middot; 4 min</div>","<div class=\"stitle\">Embedding vs Refer&#234;ncia</div>","<div class=\"two-col\">","<div style=\"background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px\">","<div style=\"font-size:11px;font-weight:600;color:#15803d;margin-bottom:6px\">&#10003; Quando embutir</div>","<div style=\"font-size:12px;color:#475569;line-height:1.6\">Dados lidos juntos com frequ&ecirc;ncia.<br>Rela&ccedil;&atilde;o 1:N pequena e est&aacute;vel.<br>Dados do filho n&atilde;o existem sem o pai.</div>","</div>","<div style=\"background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px\">","<div style=\"font-size:11px;font-weight:600;color:#991b1b;margin-bottom:6px\">&#10005; Quando referenciar</div>","<div style=\"font-size:12px;color:#475569;line-height:1.6\">Dados compartilhados por muitos documentos.<br>Dados que crescem indefinidamente.<br>Rela&ccedil;&otilde;es N:M.</div>","</div>","</div>"].join('');},
+function(){return ["<div class=\"ey\">Quiz &middot; 3 min</div>","<div class=\"stitle\">Verifica&#231;&#227;o de aprendizagem</div>","<div class=\"qb\"><div class=\"qa\">1. No MongoDB, o equivalente a uma tabela SQL é chamado de:</div>","<div class=\"qo\">","<div class=\"qop\" onclick=\"ansQ(this,'w','f0')\"><span>A</span>Document</div>","<div class=\"qop\" onclick=\"ansQ(this,'c','f0')\"><span>B</span>Collection</div>","<div class=\"qop\" onclick=\"ansQ(this,'w','f0')\"><span>C</span>Schema</div>","<div class=\"qop\" onclick=\"ansQ(this,'w','f0')\"><span>D</span>Index</div>","</div><div class=\"qfb\" id=\"f0\" style=\"background:#f0fdf4;color:#15803d\">Correto! Hierarquia MongoDB: Database &rarr; Collection &rarr; Document &rarr; Field. Collection &asymp; Tabela, Document &asymp; Linha.</div></div>","<div class=\"qb\"><div class=\"qa\">2. Qual operador atualiza apenas os campos especificados sem apagar o resto do documento?</div>","<div class=\"qo\">","<div class=\"qop\" onclick=\"ansQ(this,'w','f1')\"><span>A</span>$replace</div>","<div class=\"qop\" onclick=\"ansQ(this,'c','f1')\"><span>B</span>$set</div>","<div class=\"qop\" onclick=\"ansQ(this,'w','f1')\"><span>C</span>$update</div>","</div><div class=\"qfb\" id=\"f1\" style=\"background:#f0fdf4;color:#15803d\">Correto! $set atualiza apenas os campos listados. Sem $set, o segundo argumento do updateOne substitui o documento inteiro, perdendo todos os outros campos.</div></div>"].join('');},
+function(){return ["<div class=\"ey\">Recapitula&#231;&#227;o &middot; 2 min</div>","<div class=\"stitle\">Recapitulando</div>","<div class=\"rl\">","<div class=\"ri\"><div class=\"rn\">1</div><div class=\"rt\"><strong>NoSQL = Not Only SQL.</strong> MongoDB é banco de documentos JSON — schema flexível.</div></div>","<div class=\"ri\"><div class=\"rn\">2</div><div class=\"rt\"><strong>Collection &asymp; Tabela, Document &asymp; Linha.</strong> Documentos da mesma coleção podem ter campos diferentes.</div></div>","<div class=\"ri\"><div class=\"rn\">3</div><div class=\"rt\"><strong>CRUD:</strong> insertOne, find, updateOne ($set), deleteOne.</div></div>","<div class=\"ri\"><div class=\"rn\">4</div><div class=\"rt\"><strong>Embedding.</strong> Dados relacionados embutidos no mesmo documento — sem JOIN.</div></div>","</div>","<div class=\"hl\"><strong>Próximo passo:</strong> demo ao vivo — criar banco loja_mongo no Atlas e executar CRUD com documentos ricos.</div>"].join('');}
+];
+
+function ansQ(el,t,id){
+  var qb=el.closest('.qb');
+  qb.querySelectorAll('.qop').forEach(function(o){
+    if(o===el) o.classList.add(t==='c'?'correct':'wrong');
+    else o.classList.add('dimmed');
+  });
+  var fb=document.getElementById(id);
+  if(t!=='c'){fb.style.background='#fef2f2';fb.style.color='#dc2626';fb.textContent='N\u00e3o exatamente \u2014 relembre o conte\u00fado do slide.';}
+  fb.style.display='block';
+}
+function buildDots(){
+  var bar=document.getElementById('dots-bar');
+  bar.innerHTML='';
+  for(var i=0;i<SLIDES.length;i++){
+    var d=document.createElement('span');
+    d.className='dot'+(i===0?' active':'');
+    d.onclick=(function(idx){return function(){goTo(idx);};})(i);
+    bar.appendChild(d);
+    if(i<SLIDES.length-1){var sep=document.createElement('div');sep.className='dsep';bar.appendChild(sep);}
+  }
+}
+function buildSlides(){
+  var area=document.getElementById('slide-area');
+  area.innerHTML='';
+  for(var i=0;i<SLIDES.length;i++){
+    var div=document.createElement('div');
+    div.className='slide'+(i===0?' active':'');
+    div.id='slide-'+i;
+    div.innerHTML=SLIDES[i]();
+    area.appendChild(div);
+  }
+}
+function goTo(i){
+  document.getElementById('slide-'+cur).classList.remove('active');
+  var dots=document.querySelectorAll('.dot');
+  dots[cur].classList.remove('active');
+  if(i>cur) dots[cur].classList.add('done');
+  cur=i;
+  var el=document.getElementById('slide-'+cur);
+  el.innerHTML=SLIDES[cur]();
+  el.classList.add('active');
+  dots[cur].classList.add('active');
+  dots[cur].classList.remove('done');
+  document.getElementById('slide-area').scrollTop=0;
+  document.getElementById('btn-prev').disabled=(cur===0);
+  var bn=document.getElementById('btn-next');
+  bn.disabled=(cur===SLIDES.length-1);
+  bn.textContent=(cur===SLIDES.length-1)?'Finalizar':'Pr\u00f3ximo \u2192';
+  document.getElementById('counter').textContent=(cur+1)+' / '+SLIDES.length;
+  if(!timerStarted){timerStarted=true;startTimer();}
+}
+function goNav(dir){var ni=cur+dir;if(ni>=0&&ni<SLIDES.length)goTo(ni);}
+function startTimer(){
+  var rem=45*60;
+  var el=document.getElementById('timer');
+  timerInterval=setInterval(function(){
+    rem--;
+    var m=Math.floor(rem/60),s=rem%60;
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(rem<=300) el.className='timer warn';
+    if(rem<=60)  el.className='timer danger';
+    if(rem<=0){clearInterval(timerInterval);el.textContent='00:00';}
+  },1000);
+}
+var cur=0,timerStarted=false,timerInterval=null;
+buildDots();buildSlides();document.getElementById('btn-prev').disabled=true;
+
+</script>
+</body></html>

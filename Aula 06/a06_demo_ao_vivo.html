@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Demo &mdash; Introdução ao MongoDB &middot; Aula 06</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.full{grid-column:1/-1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.page-hdr h1{font-size:16px;font-weight:600}.page-hdr p{font-size:12px;color:#94a3b8}
+.prog-track{height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#6b21a8;border-radius:2px;transition:width .3s}
+.panel{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+.editor{background:#1e293b;min-height:300px;padding:15px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;overflow:hidden}
+#code-out{white-space:pre-wrap;word-break:break-all;color:#94a3b8}
+.cursor{display:inline-block;width:2px;height:14px;background:#60a5fa;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.preview{min-height:300px;padding:15px;overflow-y:auto;background:#fff;font-size:13px}
+.narr{background:#faf5ff;border:1px solid #d8b4fe;border-radius:10px;padding:11px 14px;font-size:13px;color:#3b0764;line-height:1.6}
+.narr strong{color:#6b21a8}
+.step-bar{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#d8b4fe;color:#6b21a8}
+.slabel{font-size:12px;color:#64748b;flex:1}
+.cb2{font-size:12px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.cb2:hover{background:#f1f5f9}.cb2.go{background:#6b21a8;color:#fff;border-color:#6b21a8}
+.cb2:disabled{opacity:.35;pointer-events:none}
+.hl{background:#faf5ff;border-left:3px solid #6b21a8;padding:9px 12px;font-size:12px;color:#3b0764;border-radius:0 6px 6px 0;margin:8px 0}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl thead tr th{background:#6b21a8;color:#fff;padding:6px 9px;text-align:left}
+.rtbl tbody tr td{padding:6px 9px;border-bottom:1px solid #e2e8f0;color:#475569}
+.rtbl tbody tr:nth-child(even){background:#f8fafc}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #6b21a8;color:#6b21a8;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#faf5ff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="full page-hdr">
+    <h1>Demo ao Vivo &mdash; Introdução ao MongoDB</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <p>Aula 06 &middot; 30 min</p>
+      <button class="next-stage" onclick="window.location.href='a06_pratica_guiada.html'">&#128221; Pr&#225;tica &rarr;</button>
+    </div>
+  </div>
+  <div class="full prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="panel">
+    <div class="ph"><span>Editor SQL / MongoDB Shell</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="editor"><span id="code-out"></span><span class="cursor"></span></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span>Resultado esperado</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="full narr" id="narr">Pronto. Clique em <strong>&#9654; Iniciar digita&#231;&#227;o</strong> para come&#231;ar.</div>
+  <div class="full step-bar">
+    <span class="sbadge" id="sbadge">Etapa 1 / 6</span>
+    <span class="slabel" id="sdesc"></span>
+    <button class="cb2" id="bp" onclick="prevS()" disabled>&#8592; Anterior</button>
+    <button class="cb2 go" id="bplay" onclick="playS()">&#9654; Iniciar digita&#231;&#227;o</button>
+    <button class="cb2" id="bn" onclick="nextS()" disabled>Pr&#243;xima &#8594;</button>
+  </div>
+</div>
+<div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+<script>
+var STEPS=[{"label": "Conectar ao Atlas e criar banco", "narr": "<strong>Docente:</strong> Abrimos o Compass conectado ao Atlas. 'use' seleciona o banco — ele só é criado de verdade no primeiro insertOne.", "code": "use loja_mongo\ndb.getName()           // 'loja_mongo'\ndb.getCollectionNames() // []", "prev": "<div class='hl'><strong>✅ Banco loja_mongo selecionado.</strong> Coleções são criadas automaticamente no primeiro insertOne.</div>"}, {"label": "insertOne com embedding e array", "narr": "<strong>Docente:</strong> Inserimos o primeiro produto. Categoria é objeto embutido, tamanhos é array — impossível representar diretamente em SQL.", "code": "db.produtos.insertOne({\n  nome:      \"Camiseta Azul\",\n  preco:     49.90,\n  estoque:   100,\n  categoria: { nome: \"Roupas\", codigo: \"ROU\" },\n  tags:      [\"algodao\", \"casual\"],\n  tamanhos:  [\"P\", \"M\", \"G\", \"GG\"]\n})", "prev": "<div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;color:#475569;line-height:1.9'>{ acknowledged: true,<br>&nbsp;&nbsp;insertedId: ObjectId(\"...\") }</div>"}, {"label": "insertMany — 3 produtos variados", "narr": "<strong>Docente:</strong> Cada produto tem estrutura diferente. O terceiro tem campo 'ajuste' que nenhum outro tem — schema flexível em ação.", "code": "db.produtos.insertMany([\n  { nome:\"Calca Jeans\", preco:129.90, estoque:45,\n    categoria:{nome:\"Roupas\"}, tamanhos:[\"36\",\"38\",\"40\"] },\n  { nome:\"Tenis Branco\", preco:219.90, estoque:30,\n    categoria:{nome:\"Calcados\"}, numeracao:[38,39,40] },\n  { nome:\"Bone Preto\", preco:39.90, estoque:200,\n    categoria:{nome:\"Acessorios\"}, ajuste:\"snapback\" }\n])\ndb.produtos.countDocuments() // 4", "prev": "<div class='hl'><strong>4 documentos inseridos.</strong> Tenis tem campo 'numeracao' que Camiseta não tem. Bone tem 'ajuste' que nenhum outro tem. Isso é o schema flexível do MongoDB.</div>"}, {"label": "find() com filtros", "narr": "<strong>Docente:</strong> find() com operadores de comparação e notação ponto para campos aninhados.", "code": "db.produtos.find({ preco: { $gt: 50 } })\ndb.produtos.find({ \"categoria.nome\": \"Roupas\" })\ndb.produtos.find({}, { nome:1, preco:1, _id:0 })", "prev": "<div class='hl'><strong>Notação ponto</strong> \"categoria.nome\" acessa campos de documentos embutidos — sem JOIN necessário.</div>"}, {"label": "updateOne com $set", "narr": "<strong>Docente:</strong> $set atualiza apenas os campos especificados. Sem $set, o documento inteiro é substituído.", "code": "db.produtos.updateOne(\n  { nome: \"Camiseta Azul\" },\n  { $set: { preco: 54.90, ativo: true } }\n)\ndb.produtos.findOne({ nome: \"Camiseta Azul\" })", "prev": "<div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;color:#475569;line-height:1.9'>nome: \"Camiseta Azul\"<br>preco: <span style='color:#22c55e;font-weight:600'>54.90</span><br>ativo: <span style='color:#22c55e'>true</span> ← novo campo!</div>"}, {"label": "deleteOne e sort", "narr": "<strong>Docente:</strong> deleteOne remove o primeiro documento que combina com o filtro. sort() ordena os resultados.", "code": "db.produtos.deleteOne({ nome: \"Bone Preto\" })\ndb.produtos.countDocuments() // 3\ndb.produtos.find().sort({ preco: -1 }).limit(2)", "prev": "<div class='hl'><strong>sort({ preco: -1 })</strong> = ORDER BY preco DESC. <strong>.limit(2)</strong> = LIMIT 2.</div>"}];
+
+let cur=0,typing=false,typeTimer=null;
+function render(){
+  var s=STEPS[cur];
+  document.getElementById('sbadge').textContent='Etapa '+(cur+1)+' / '+STEPS.length;
+  document.getElementById('sdesc').textContent=s.label;
+  document.getElementById('prog-fill').style.width=Math.round(((cur+1)/STEPS.length)*100)+'%';
+  document.getElementById('bp').disabled=(cur===0);
+  document.getElementById('bn').disabled=(cur===STEPS.length-1);
+  document.getElementById('narr').innerHTML=s.narr;
+  document.getElementById('preview').innerHTML=s.prev||'';
+}
+function playS(){
+  if(typing)return;
+  typing=true;
+  var s=STEPS[cur];
+  var out=document.getElementById('code-out');
+  out.innerHTML='';
+  document.getElementById('bplay').disabled=true;
+  document.getElementById('bp').disabled=true;
+  document.getElementById('bn').disabled=true;
+  var full=s.code;
+  var parts=[];
+  var i=0;
+  while(i<full.length){
+    if(full[i]==='<'){
+      var end=full.indexOf('>',i);
+      if(end!==-1){parts.push({type:'tag',val:full.slice(i,end+1)});i=end+1;continue;}
+    }
+    parts.push({type:'char',val:full[i]});i++;
+  }
+  var pi=0;
+  function tick(){
+    if(pi>=parts.length){
+      typing=false;
+      document.getElementById('bplay').textContent='Rever';
+      document.getElementById('bplay').disabled=false;
+      document.getElementById('bn').disabled=(cur===STEPS.length-1);
+      document.getElementById('bp').disabled=false;
+      return;
+    }
+    var p=parts[pi];
+    if(p.type==='tag'){out.innerHTML+=p.val;pi++;tick();return;}
+    out.innerHTML+=p.val;pi++;
+    typeTimer=setTimeout(tick,p.val==='\n'?55:p.val===' '?18:Math.random()*20+16);
+  }
+  tick();
+}
+function nextS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.min(cur+1,STEPS.length-1);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+function prevS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.max(cur-1,0);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+render();
+document.getElementById('code-out').innerHTML='';
+
+</script>
+</body></html>

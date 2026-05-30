@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Demo &mdash; SELECT avançado e INNER JOIN &middot; Aula 04</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.full{grid-column:1/-1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.page-hdr h1{font-size:16px;font-weight:600}.page-hdr p{font-size:12px;color:#94a3b8}
+.prog-track{height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#15803d;border-radius:2px;transition:width .3s}
+.panel{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+.editor{background:#1e293b;min-height:300px;padding:15px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;overflow:hidden}
+#code-out{white-space:pre-wrap;word-break:break-all;color:#94a3b8}
+.cursor{display:inline-block;width:2px;height:14px;background:#60a5fa;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.preview{min-height:300px;padding:15px;overflow-y:auto;background:#fff;font-size:13px}
+.narr{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:11px 14px;font-size:13px;color:#14532d;line-height:1.6}
+.narr strong{color:#15803d}
+.step-bar{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#86efac;color:#15803d}
+.slabel{font-size:12px;color:#64748b;flex:1}
+.cb2{font-size:12px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.cb2:hover{background:#f1f5f9}.cb2.go{background:#15803d;color:#fff;border-color:#15803d}
+.cb2:disabled{opacity:.35;pointer-events:none}
+.hl{background:#f0fdf4;border-left:3px solid #15803d;padding:9px 12px;font-size:12px;color:#14532d;border-radius:0 6px 6px 0;margin:8px 0}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl thead tr th{background:#15803d;color:#fff;padding:6px 9px;text-align:left}
+.rtbl tbody tr td{padding:6px 9px;border-bottom:1px solid #e2e8f0;color:#475569}
+.rtbl tbody tr:nth-child(even){background:#f8fafc}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #15803d;color:#15803d;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#f0fdf4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="full page-hdr">
+    <h1>Demo ao Vivo &mdash; SELECT avançado e INNER JOIN</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <p>Aula 04 &middot; 30 min</p>
+      <button class="next-stage" onclick="window.location.href='a04_pratica_guiada.html'">&#128221; Pr&#225;tica &rarr;</button>
+    </div>
+  </div>
+  <div class="full prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="panel">
+    <div class="ph"><span>Editor SQL / MongoDB Shell</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="editor"><span id="code-out"></span><span class="cursor"></span></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span>Resultado esperado</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="full narr" id="narr">Pronto. Clique em <strong>&#9654; Iniciar digita&#231;&#227;o</strong> para come&#231;ar.</div>
+  <div class="full step-bar">
+    <span class="sbadge" id="sbadge">Etapa 1 / 6</span>
+    <span class="slabel" id="sdesc"></span>
+    <button class="cb2" id="bp" onclick="prevS()" disabled>&#8592; Anterior</button>
+    <button class="cb2 go" id="bplay" onclick="playS()">&#9654; Iniciar digita&#231;&#227;o</button>
+    <button class="cb2" id="bn" onclick="nextS()" disabled>Pr&#243;xima &#8594;</button>
+  </div>
+</div>
+<div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+<script>
+var STEPS=[{"label": "SELECT com BETWEEN e LIKE", "narr": "<strong>Docente:</strong> Revisão de SELECT avançado antes do JOIN. BETWEEN para faixa de valores, LIKE para busca por padrão.", "code": "SELECT nome, preco FROM produto\nWHERE preco BETWEEN 40 AND 200\nORDER BY preco;\n\nSELECT nome FROM produto\nWHERE nome LIKE 'Ca%';", "prev": "<div class='hl'><strong>BETWEEN 40 AND 200</strong> equivale a >= 40 AND <= 200. <strong>LIKE 'Ca%'</strong> retorna Camiseta e Calça — nomes que começam com 'Ca'.</div>"}, {"label": "INNER JOIN — produto + categoria", "narr": "<strong>Docente:</strong> O JOIN resolve o problema do id numérico. Alias 'p' e 'c' evitam ambiguidade.", "code": "SELECT\n  p.nome   AS produto,\n  p.preco,\n  c.nome   AS categoria\nFROM produto p\nINNER JOIN categoria c\n  ON p.id_categoria = c.id_categoria\nORDER BY p.preco DESC;", "prev": "<table class='rtbl'><thead><tr><th>produto</th><th>preco</th><th>categoria</th></tr></thead><tbody><tr><td>Tenis Branco</td><td>219.90</td><td>Calcados</td></tr><tr><td>Calca Jeans</td><td>129.90</td><td>Roupas</td></tr><tr><td>Camiseta Azul</td><td>49.90</td><td>Roupas</td></tr></tbody></table>"}, {"label": "LEFT JOIN — categorias sem produtos", "narr": "<strong>Docente:</strong> Inserimos 'Informatica' sem produtos. INNER JOIN não mostra. LEFT JOIN mostra com NULL.", "code": "INSERT INTO categoria (nome) VALUES ('Informatica');\n\n-- LEFT JOIN: Informatica aparece com NULL\nSELECT c.nome AS categoria, p.nome AS produto\nFROM categoria c\nLEFT JOIN produto p\n  ON c.id_categoria = p.id_categoria;", "prev": "<table class='rtbl'><thead><tr><th>categoria</th><th>produto</th></tr></thead><tbody><tr><td>Roupas</td><td>Camiseta Azul</td></tr><tr><td>Roupas</td><td>Calca Jeans</td></tr><tr><td>Calcados</td><td>Tenis Branco</td></tr><tr><td>Informatica</td><td style='color:#94a3b8'>NULL</td></tr></tbody></table>"}, {"label": "GROUP BY + COUNT", "narr": "<strong>Docente:</strong> Contamos os produtos por categoria. GROUP BY c.nome agrupa, COUNT conta dentro de cada grupo.", "code": "SELECT\n  c.nome              AS categoria,\n  COUNT(p.id_produto) AS total\nFROM categoria c\nINNER JOIN produto p\n  ON c.id_categoria = p.id_categoria\nGROUP BY c.nome\nORDER BY total DESC;", "prev": "<table class='rtbl'><thead><tr><th>categoria</th><th>total</th></tr></thead><tbody><tr><td>Roupas</td><td>2</td></tr><tr><td>Calcados</td><td>1</td></tr></tbody></table>"}, {"label": "GROUP BY + SUM + AVG + HAVING", "narr": "<strong>Docente:</strong> Análise completa de estoque. HAVING filtra grupos depois do agrupamento.", "code": "SELECT\n  c.nome,\n  COUNT(p.id_produto)       AS qtd,\n  ROUND(AVG(p.preco), 2)   AS preco_medio,\n  SUM(p.preco * p.estoque) AS valor_estoque\nFROM categoria c\nINNER JOIN produto p\n  ON c.id_categoria = p.id_categoria\nGROUP BY c.nome\nHAVING COUNT(p.id_produto) >= 1\nORDER BY valor_estoque DESC;", "prev": "<table class='rtbl'><thead><tr><th>nome</th><th>qtd</th><th>preco_medio</th><th>valor_estoque</th></tr></thead><tbody><tr><td>Roupas</td><td>2</td><td>89.90</td><td>6833.50</td></tr><tr><td>Calcados</td><td>1</td><td>219.90</td><td>6597.00</td></tr></tbody></table>"}, {"label": "Erro clássico: WHERE COUNT", "narr": "<strong>Docente:</strong> WHERE COUNT(*) >= 1 — o erro mais comum com GROUP BY. A solução é usar HAVING.", "code": "-- ERRO: WHERE com função de agregação\nSELECT c.nome, COUNT(*) AS qtd\nFROM categoria c\nINNER JOIN produto p ON c.id_categoria = p.id_categoria\nGROUP BY c.nome\nWHERE COUNT(*) >= 1; -- Error 1111!\n\n-- CORRETO: HAVING\nSELECT c.nome, COUNT(*) AS qtd\nFROM categoria c\nINNER JOIN produto p ON c.id_categoria = p.id_categoria\nGROUP BY c.nome\nHAVING COUNT(*) >= 1;", "prev": "<div style='background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px;font-size:12px;color:#991b1b;margin-bottom:8px'>❌ Error 1111: Invalid use of group function</div><div class='hl'><strong>HAVING</strong> é o estágio correto para filtrar por COUNT, SUM, AVG. WHERE acontece antes do GROUP BY, quando COUNT ainda não existe.</div>"}];
+
+let cur=0,typing=false,typeTimer=null;
+function render(){
+  var s=STEPS[cur];
+  document.getElementById('sbadge').textContent='Etapa '+(cur+1)+' / '+STEPS.length;
+  document.getElementById('sdesc').textContent=s.label;
+  document.getElementById('prog-fill').style.width=Math.round(((cur+1)/STEPS.length)*100)+'%';
+  document.getElementById('bp').disabled=(cur===0);
+  document.getElementById('bn').disabled=(cur===STEPS.length-1);
+  document.getElementById('narr').innerHTML=s.narr;
+  document.getElementById('preview').innerHTML=s.prev||'';
+}
+function playS(){
+  if(typing)return;
+  typing=true;
+  var s=STEPS[cur];
+  var out=document.getElementById('code-out');
+  out.innerHTML='';
+  document.getElementById('bplay').disabled=true;
+  document.getElementById('bp').disabled=true;
+  document.getElementById('bn').disabled=true;
+  var full=s.code;
+  var parts=[];
+  var i=0;
+  while(i<full.length){
+    if(full[i]==='<'){
+      var end=full.indexOf('>',i);
+      if(end!==-1){parts.push({type:'tag',val:full.slice(i,end+1)});i=end+1;continue;}
+    }
+    parts.push({type:'char',val:full[i]});i++;
+  }
+  var pi=0;
+  function tick(){
+    if(pi>=parts.length){
+      typing=false;
+      document.getElementById('bplay').textContent='Rever';
+      document.getElementById('bplay').disabled=false;
+      document.getElementById('bn').disabled=(cur===STEPS.length-1);
+      document.getElementById('bp').disabled=false;
+      return;
+    }
+    var p=parts[pi];
+    if(p.type==='tag'){out.innerHTML+=p.val;pi++;tick();return;}
+    out.innerHTML+=p.val;pi++;
+    typeTimer=setTimeout(tick,p.val==='\n'?55:p.val===' '?18:Math.random()*20+16);
+  }
+  tick();
+}
+function nextS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.min(cur+1,STEPS.length-1);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+function prevS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.max(cur-1,0);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+render();
+document.getElementById('code-out').innerHTML='';
+
+</script>
+</body></html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exposi&#231;&#227;o &mdash; UPDATE, DELETE e Transações &middot; Aula 05</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;gap:8px;flex-wrap:wrap;min-height:52px}
+.badge{background:#c2410c;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.hdr-title{font-size:14px;font-weight:600}.hdr-sub{font-size:12px;color:#94a3b8;margin-top:1px}
+.timer{font-size:13px;font-weight:500;background:#f1f5f9;padding:5px 14px;border-radius:8px;border:1px solid #e2e8f0;font-family:monospace;color:#475569;min-width:64px;text-align:center}
+.timer.warn{color:#d97706;background:#fffbeb}.timer.danger{color:#dc2626;background:#fef2f2}
+.dots{display:flex;align-items:center;gap:5px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0;overflow-x:auto}
+.dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;cursor:pointer;transition:all .2s;flex-shrink:0}
+.dot.active{background:#c2410c;transform:scale(1.4)}.dot.done{background:#c2410c;opacity:.4}
+.dsep{width:10px;height:1px;background:#e2e8f0;flex-shrink:0}
+.slide-area{flex:1;overflow-y:auto;padding:22px 28px}
+.slide{display:none}.slide.active{display:block;animation:sIn .22s ease}
+@keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ey{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#c2410c;margin-bottom:5px}
+.stitle{font-size:21px;font-weight:600;color:#1e293b;line-height:1.2;margin-bottom:5px}
+.ssub{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px}
+.card.ac{border-left:3px solid #c2410c}
+.ci{font-size:18px;margin-bottom:5px}.ct{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:3px}
+.cb{font-size:12px;color:#64748b;line-height:1.5}
+.cw{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin:10px 0}
+.ch{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:7px 13px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:13px 16px;font-size:12px;line-height:1.8;overflow-x:auto;font-family:monospace;white-space:pre;margin:0}
+.hl{background:#fff7ed;border-left:3px solid #c2410c;padding:10px 13px;font-size:12.5px;color:#7c2d12;line-height:1.55;margin:10px 0}
+.hl strong{color:#c2410c}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+.qb{margin-bottom:16px}.qa{font-size:13.5px;font-weight:600;color:#1e293b;margin-bottom:11px;line-height:1.5}
+.qo{display:flex;flex-direction:column;gap:7px}
+.qop{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s;color:#1e293b}
+.qop:hover:not(.correct):not(.wrong):not(.dimmed){border-color:#c2410c;background:#fff7ed}
+.qop.correct{background:#f0fdf4;border-color:#86efac;color:#15803d;pointer-events:none}
+.qop.wrong{background:#fef2f2;border-color:#fca5a5;color:#dc2626;pointer-events:none}
+.qop.dimmed{opacity:.4;pointer-events:none}
+.qfb{margin-top:9px;padding:9px 13px;border-radius:8px;font-size:12.5px;line-height:1.5;display:none}
+.rl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ri{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px 13px}
+.rn{width:23px;height:23px;min-width:23px;border-radius:6px;background:#fed7aa;color:#c2410c;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rt{font-size:13px;color:#64748b;line-height:1.55}.rt strong{color:#1e293b;font-weight:600}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.comp-table thead tr th{background:#c2410c;color:#fff;padding:7px 10px;text-align:left;font-weight:600}
+.comp-table tbody tr td{padding:7px 10px;border-bottom:1px solid #e2e8f0;color:#475569;vertical-align:top}
+.comp-table tbody tr:nth-child(even){background:#f8fafc}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.rtbl thead tr th{background:#c2410c;color:#fff;padding:6px 10px;text-align:left}
+.rtbl tbody tr td{padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#475569}
+.rtbl tbody tr:nth-child(even){background:#f8fafc}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-top:1px solid #e2e8f0;background:#fff;flex-shrink:0}
+.nb{background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;padding:7px 17px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.nb:hover{background:#e2e8f0}.nb.pr{background:#c2410c;color:#fff;border-color:#c2410c}
+.nb:disabled{opacity:.35;pointer-events:none}.nc{font-size:12px;color:#94a3b8}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #c2410c;color:#c2410c;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#fff7ed}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:11px">
+      <span class="badge">Aula 05</span>
+      <div><div class="hdr-title">UPDATE, DELETE e Transações &mdash; Exposi&#231;&#227;o Dialogada</div>
+      <div class="hdr-sub">45 minutos &middot; Projetor &middot; Turma</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div class="timer" id="timer">45:00</div>
+      <button class="next-stage" onclick="window.location.href='a05_demo_ao_vivo.html'">&#128187; Demo &rarr;</button>
+    </div>
+  </div>
+  <div class="dots" id="dots-bar"></div>
+  <div class="slide-area" id="slide-area"></div>
+  <div class="nav">
+    <button class="nb" id="btn-prev" onclick="goNav(-1)" disabled>&#8592; Anterior</button>
+    <span class="nc" id="counter">1 / 8</span>
+    <button class="nb pr" id="btn-next" onclick="goNav(1)">Pr&#243;ximo &#8594;</button>
+  </div>
+  <div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+</div>
+<script>
+var SLIDES=[
+function(){return ["<div class=\"ey\">Abertura &middot; 3 min</div>","<div class=\"stitle\">SELECT e JOIN sabemos — e quando precisamos mudar ou remover dados?</div>","<div class=\"ssub\">Até agora só lemos dados. Hoje vamos escrever: UPDATE para atualizar, DELETE para remover, e transações para garantir que operações críticas sejam atômicas.</div>","<div class=\"cards\">","<div class=\"card ac\"><div class=\"ci\">&#9999;&#65039;</div><div class=\"ct\">UPDATE</div><div class=\"cb\">Altera dados existentes. SEMPRE com WHERE. Sem WHERE, atualiza TODOS os registros.</div></div>","<div class=\"card ac\"><div class=\"ci\">&#128465;&#65039;</div><div class=\"ct\">DELETE</div><div class=\"cb\">Remove registros. SEMPRE com WHERE. Sem WHERE, remove TUDO.</div></div>","<div class=\"card\"><div class=\"ci\">&#128274;</div><div class=\"ct\">Transação</div><div class=\"cb\">Grupo de operações que funciona como uma unidade. Tudo ou nada — COMMIT salva, ROLLBACK desfaz.</div></div>","<div class=\"card\"><div class=\"ci\">&#128313;</div><div class=\"ct\">VIEW</div><div class=\"cb\">Consulta salva com nome. Simplifica queries complexas e pode ser usada como tabela virtual.</div></div>","</div>"].join('');},
+function(){return ["<div class=\"ey\">UPDATE &middot; 4 min</div>","<div class=\"stitle\">UPDATE — a regra de ouro: SELECT antes de UPDATE</div>","<div class=\"cw\"><div class=\"ch\"><span>SQL &middot; UPDATE seguro</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>-- PASSO 1: confirmar o que vai mudar\nSELECT nome, preco FROM produto\nWHERE id_produto = 1;\n\n-- PASSO 2: executar o UPDATE\nUPDATE produto\nSET preco = 54.90\nWHERE id_produto = 1;\n\n-- PASSO 3: confirmar\nSELECT nome, preco FROM produto\nWHERE id_produto = 1;</pre></div>","<div class=\"hl\"><strong>UPDATE sem WHERE</strong> altera TODOS os registros da tabela. Não tem Ctrl+Z no SQL sem transação ativa. A regra é: escreva o WHERE primeiro, teste com SELECT, só então execute o UPDATE.</div>"].join('');},
+function(){return ["<div class=\"ey\">DELETE &middot; 3 min</div>","<div class=\"stitle\">DELETE — sempre pelo ID, nunca pelo nome</div>","<div class=\"cw\"><div class=\"ch\"><span>SQL &middot; DELETE seguro</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>-- Confirmar antes\nSELECT id_produto, nome FROM produto\nWHERE id_produto = 5;\n\n-- Deletar pelo ID (não pelo nome)\nDELETE FROM produto\nWHERE id_produto = 5;</pre></div>","<div class=\"hl\"><strong>Deletar pelo nome é arriscado:</strong> dois produtos podem ter o mesmo nome. Deletar pelo id_produto é mais seguro — o ID é único por definição (PRIMARY KEY).</div>"].join('');},
+function(){return ["<div class=\"ey\">Transa&#231;&#245;es &middot; 5 min</div>","<div class=\"stitle\">START TRANSACTION, COMMIT, ROLLBACK</div>","<div class=\"cw\"><div class=\"ch\"><span>SQL &middot; transa&#231;&#227;o ACID</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>START TRANSACTION;\n\n-- Aumentar preco de Roupas em 10%\nUPDATE produto\nSET preco = preco * 1.10\nWHERE id_categoria = 1;\n\n-- Ver resultado (só você vê por enquanto)\nSELECT nome, preco FROM produto\nWHERE id_categoria = 1;\n\n-- Desfazer\nROLLBACK;\n\n-- OU confirmar permanentemente\n-- COMMIT;</pre></div>","<div class=\"hl\"><strong>ACID:</strong> Atomicidade (tudo ou nada), Consistência, Isolamento (outros usuários não veem até o COMMIT), Durabilidade (após COMMIT, persiste mesmo com queda de energia).</div>"].join('');},
+function(){return ["<div class=\"ey\">Subconsulta &middot; 4 min</div>","<div class=\"stitle\">SELECT dentro de SELECT</div>","<div class=\"cw\"><div class=\"ch\"><span>SQL &middot; subconsulta escalar</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>-- Produtos com preco acima da media\nSELECT nome, preco\nFROM produto\nWHERE preco &gt; (\n  SELECT AVG(preco) FROM produto\n)\nORDER BY preco DESC;</pre></div>","<div class=\"hl\"><strong>Subconsulta escalar</strong> retorna um único valor e é usada como se fosse uma constante. O banco executa a subconsulta primeiro, depois usa o resultado como filtro do WHERE externo.</div>"].join('');},
+function(){return ["<div class=\"ey\">VIEW &middot; 3 min</div>","<div class=\"stitle\">CREATE VIEW — consulta com nome</div>","<div class=\"cw\"><div class=\"ch\"><span>SQL &middot; CREATE VIEW</span><div class=\"cd\"><div class=\"c1\" style=\"background:#ef4444\"></div><div class=\"c1\" style=\"background:#f59e0b\"></div><div class=\"c1\" style=\"background:#10b981\"></div></div></div>","<pre>CREATE OR REPLACE VIEW vw_estoque AS\nSELECT\n  c.nome             AS categoria,\n  COUNT(p.id_produto) AS qtd,\n  SUM(p.estoque)     AS estoque_total\nFROM categoria c\nINNER JOIN produto p\n  ON c.id_categoria = p.id_categoria\nGROUP BY c.nome;\n\n-- Usar como tabela\nSELECT * FROM vw_estoque;</pre></div>","<div class=\"hl\"><strong>VIEW não armazena dados</strong> — ela executa a query toda vez que é consultada. Insira um novo produto e re-execute SELECT * FROM vw_estoque: o resultado atualiza automaticamente.</div>"].join('');},
+function(){return ["<div class=\"ey\">Quiz &middot; 3 min</div>","<div class=\"stitle\">Verifica&#231;&#227;o de aprendizagem</div>","<div class=\"qb\"><div class=\"qa\">1. Você quer reajustar o preço de todos os produtos da categoria Roupas em 10%. O que fazer ANTES do UPDATE?</div>","<div class=\"qo\">","<div class=\"qop\" onclick=\"ansQ(this,'w','f0')\"><span>A</span>Fazer backup do banco inteiro</div>","<div class=\"qop\" onclick=\"ansQ(this,'c','f0')\"><span>B</span>Executar um SELECT com o mesmo WHERE para confirmar quais registros serão afetados</div>","<div class=\"qop\" onclick=\"ansQ(this,'w','f0')\"><span>C</span>Nada — executar direto o UPDATE</div>","</div><div class=\"qfb\" id=\"f0\" style=\"background:#f0fdf4;color:#15803d\">Correto! SELECT antes do UPDATE é a regra de ouro. Confirme quantos e quais registros serão afetados antes de executar a alteração.</div></div>","<div class=\"qb\"><div class=\"qa\">2. Qual a diferença entre ROLLBACK e COMMIT?</div>","<div class=\"qo\">","<div class=\"qop\" onclick=\"ansQ(this,'w','f1')\"><span>A</span>São sinônimos — fazem a mesma coisa</div>","<div class=\"qop\" onclick=\"ansQ(this,'w','f1')\"><span>B</span>ROLLBACK salva, COMMIT desfaz</div>","<div class=\"qop\" onclick=\"ansQ(this,'c','f1')\"><span>C</span>COMMIT salva permanentemente, ROLLBACK desfaz tudo desde o START TRANSACTION</div>","</div><div class=\"qfb\" id=\"f1\" style=\"background:#f0fdf4;color:#15803d\">Correto! COMMIT persiste as alterações para todos os usuários. ROLLBACK desfaz todas as alterações feitas desde o START TRANSACTION.</div></div>"].join('');},
+function(){return ["<div class=\"ey\">Recapitula&#231;&#227;o &middot; 2 min</div>","<div class=\"stitle\">Recapitulando</div>","<div class=\"rl\">","<div class=\"ri\"><div class=\"rn\">1</div><div class=\"rt\"><strong>UPDATE.</strong> SEMPRE com WHERE. SELECT antes para confirmar. Sem WHERE altera tudo.</div></div>","<div class=\"ri\"><div class=\"rn\">2</div><div class=\"rt\"><strong>DELETE.</strong> SEMPRE com WHERE. Deletar pelo ID é mais seguro que pelo nome.</div></div>","<div class=\"ri\"><div class=\"rn\">3</div><div class=\"rt\"><strong>Transações.</strong> START TRANSACTION abre. COMMIT salva. ROLLBACK desfaz. Fundamental para operações críticas.</div></div>","<div class=\"ri\"><div class=\"rn\">4</div><div class=\"rt\"><strong>Subconsulta.</strong> SELECT dentro de SELECT. A interna executa primeiro e retorna um valor para a externa.</div></div>","<div class=\"ri\"><div class=\"rn\">5</div><div class=\"rt\"><strong>VIEW.</strong> Consulta salva com nome. Não armazena dados — executa a query toda vez.</div></div>","</div>","<div class=\"hl\"><strong>Próximo passo:</strong> Aula 06 — o que é NoSQL e por que o MongoDB resolve problemas que o SQL não resolve bem.</div>"].join('');}
+];
+
+function ansQ(el,t,id){
+  var qb=el.closest('.qb');
+  qb.querySelectorAll('.qop').forEach(function(o){
+    if(o===el) o.classList.add(t==='c'?'correct':'wrong');
+    else o.classList.add('dimmed');
+  });
+  var fb=document.getElementById(id);
+  if(t!=='c'){fb.style.background='#fef2f2';fb.style.color='#dc2626';fb.textContent='N\u00e3o exatamente \u2014 relembre o conte\u00fado do slide.';}
+  fb.style.display='block';
+}
+function buildDots(){
+  var bar=document.getElementById('dots-bar');
+  bar.innerHTML='';
+  for(var i=0;i<SLIDES.length;i++){
+    var d=document.createElement('span');
+    d.className='dot'+(i===0?' active':'');
+    d.onclick=(function(idx){return function(){goTo(idx);};})(i);
+    bar.appendChild(d);
+    if(i<SLIDES.length-1){var sep=document.createElement('div');sep.className='dsep';bar.appendChild(sep);}
+  }
+}
+function buildSlides(){
+  var area=document.getElementById('slide-area');
+  area.innerHTML='';
+  for(var i=0;i<SLIDES.length;i++){
+    var div=document.createElement('div');
+    div.className='slide'+(i===0?' active':'');
+    div.id='slide-'+i;
+    div.innerHTML=SLIDES[i]();
+    area.appendChild(div);
+  }
+}
+function goTo(i){
+  document.getElementById('slide-'+cur).classList.remove('active');
+  var dots=document.querySelectorAll('.dot');
+  dots[cur].classList.remove('active');
+  if(i>cur) dots[cur].classList.add('done');
+  cur=i;
+  var el=document.getElementById('slide-'+cur);
+  el.innerHTML=SLIDES[cur]();
+  el.classList.add('active');
+  dots[cur].classList.add('active');
+  dots[cur].classList.remove('done');
+  document.getElementById('slide-area').scrollTop=0;
+  document.getElementById('btn-prev').disabled=(cur===0);
+  var bn=document.getElementById('btn-next');
+  bn.disabled=(cur===SLIDES.length-1);
+  bn.textContent=(cur===SLIDES.length-1)?'Finalizar':'Pr\u00f3ximo \u2192';
+  document.getElementById('counter').textContent=(cur+1)+' / '+SLIDES.length;
+  if(!timerStarted){timerStarted=true;startTimer();}
+}
+function goNav(dir){var ni=cur+dir;if(ni>=0&&ni<SLIDES.length)goTo(ni);}
+function startTimer(){
+  var rem=45*60;
+  var el=document.getElementById('timer');
+  timerInterval=setInterval(function(){
+    rem--;
+    var m=Math.floor(rem/60),s=rem%60;
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(rem<=300) el.className='timer warn';
+    if(rem<=60)  el.className='timer danger';
+    if(rem<=0){clearInterval(timerInterval);el.textContent='00:00';}
+  },1000);
+}
+var cur=0,timerStarted=false,timerInterval=null;
+buildDots();buildSlides();document.getElementById('btn-prev').disabled=true;
+
+</script>
+</body></html>

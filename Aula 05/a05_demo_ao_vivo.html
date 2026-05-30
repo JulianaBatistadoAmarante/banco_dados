@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Demo &mdash; UPDATE, DELETE e Transações &middot; Aula 05</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.full{grid-column:1/-1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.page-hdr h1{font-size:16px;font-weight:600}.page-hdr p{font-size:12px;color:#94a3b8}
+.prog-track{height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#c2410c;border-radius:2px;transition:width .3s}
+.panel{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:500;color:#64748b}
+.cd{display:flex;gap:5px}.c1{width:10px;height:10px;border-radius:50%}
+.editor{background:#1e293b;min-height:300px;padding:15px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;overflow:hidden}
+#code-out{white-space:pre-wrap;word-break:break-all;color:#94a3b8}
+.cursor{display:inline-block;width:2px;height:14px;background:#60a5fa;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.preview{min-height:300px;padding:15px;overflow-y:auto;background:#fff;font-size:13px}
+.narr{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:11px 14px;font-size:13px;color:#7c2d12;line-height:1.6}
+.narr strong{color:#c2410c}
+.step-bar{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.sbadge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#fed7aa;color:#c2410c}
+.slabel{font-size:12px;color:#64748b;flex:1}
+.cb2{font-size:12px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.cb2:hover{background:#f1f5f9}.cb2.go{background:#c2410c;color:#fff;border-color:#c2410c}
+.cb2:disabled{opacity:.35;pointer-events:none}
+.hl{background:#fff7ed;border-left:3px solid #c2410c;padding:9px 12px;font-size:12px;color:#7c2d12;border-radius:0 6px 6px 0;margin:8px 0}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl thead tr th{background:#c2410c;color:#fff;padding:6px 9px;text-align:left}
+.rtbl tbody tr td{padding:6px 9px;border-bottom:1px solid #e2e8f0;color:#475569}
+.rtbl tbody tr:nth-child(even){background:#f8fafc}
+@media(max-width:680px){.wrap{grid-template-columns:1fr}}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+.next-stage{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #c2410c;color:#c2410c;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.next-stage:hover{background:#fff7ed}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="full page-hdr">
+    <h1>Demo ao Vivo &mdash; UPDATE, DELETE e Transações</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <p>Aula 05 &middot; 30 min</p>
+      <button class="next-stage" onclick="window.location.href='a05_pratica_guiada.html'">&#128221; Pr&#225;tica &rarr;</button>
+    </div>
+  </div>
+  <div class="full prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="panel">
+    <div class="ph"><span>Editor SQL / MongoDB Shell</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="editor"><span id="code-out"></span><span class="cursor"></span></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span>Resultado esperado</span>
+    <div class="cd"><div class="c1" style="background:#ef4444"></div><div class="c1" style="background:#f59e0b"></div><div class="c1" style="background:#10b981"></div></div></div>
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="full narr" id="narr">Pronto. Clique em <strong>&#9654; Iniciar digita&#231;&#227;o</strong> para come&#231;ar.</div>
+  <div class="full step-bar">
+    <span class="sbadge" id="sbadge">Etapa 1 / 6</span>
+    <span class="slabel" id="sdesc"></span>
+    <button class="cb2" id="bp" onclick="prevS()" disabled>&#8592; Anterior</button>
+    <button class="cb2 go" id="bplay" onclick="playS()">&#9654; Iniciar digita&#231;&#227;o</button>
+    <button class="cb2" id="bn" onclick="nextS()" disabled>Pr&#243;xima &#8594;</button>
+  </div>
+</div>
+<div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+<script>
+var STEPS=[{"label": "SELECT antes do UPDATE — regra de ouro", "narr": "<strong>Docente:</strong> Antes de qualquer UPDATE, execute um SELECT com o mesmo WHERE para confirmar quantos registros serão afetados.", "code": "-- PASSO 1: confirmar\nSELECT nome, preco FROM produto\nWHERE id_produto = 1;\n\n-- PASSO 2: atualizar\nUPDATE produto\nSET preco = 54.90\nWHERE id_produto = 1;\n\n-- PASSO 3: verificar\nSELECT nome, preco FROM produto\nWHERE id_produto = 1;", "prev": "<div class='hl'><strong>Resultado:</strong> Camiseta Azul passou de 49.90 para 54.90. Os outros produtos não foram afetados porque o WHERE especificou o id_produto = 1.</div>"}, {"label": "DELETE seguro — pelo ID", "narr": "<strong>Docente:</strong> Inserimos um produto temporário e deletamos pelo ID. Deletar pelo nome é arriscado — pode haver duplicatas.", "code": "-- Inserir para testar\nINSERT INTO produto (id_categoria, nome, preco)\nVALUES (1, 'Produto Teste', 9.90);\n\n-- Confirmar\nSELECT id_produto, nome FROM produto\nWHERE nome = 'Produto Teste';\n\n-- Deletar pelo ID\nDELETE FROM produto\nWHERE id_produto = LAST_INSERT_ID();", "prev": "<div class='hl'><strong>LAST_INSERT_ID()</strong> retorna o id gerado pelo último INSERT. Mais seguro que deletar pelo nome — o ID é único garantido pela PRIMARY KEY.</div>"}, {"label": "START TRANSACTION + ROLLBACK", "narr": "<strong>Docente:</strong> Abrimos uma transação, fazemos um UPDATE e desfazemos com ROLLBACK. A mudança nunca chegou ao banco.", "code": "START TRANSACTION;\n\nUPDATE produto\nSET preco = preco * 1.10\nWHERE id_categoria = 1;\n\n-- Ver mudança (só você vê)\nSELECT nome, preco FROM produto\nWHERE id_categoria = 1;\n\n-- Desfazer\nROLLBACK;\n\n-- Confirmar que voltou ao original\nSELECT nome, preco FROM produto\nWHERE id_categoria = 1;", "prev": "<div class='hl'><strong>Após ROLLBACK:</strong> Camiseta volta para 54.90, Calça para 129.90. A transação foi desfeita como se nunca tivesse acontecido.</div>"}, {"label": "Subconsulta — produtos acima da média", "narr": "<strong>Docente:</strong> A subconsulta interna executa primeiro (AVG = 132.90), depois filtra os produtos acima disso.", "code": "-- Ver a média primeiro\nSELECT AVG(preco) FROM produto;\n-- Resultado: 144.90\n\n-- Subconsulta completa\nSELECT nome, preco\nFROM produto\nWHERE preco > (\n  SELECT AVG(preco) FROM produto\n)\nORDER BY preco DESC;", "prev": "<table class='rtbl'><thead><tr><th>nome</th><th>preco</th></tr></thead><tbody><tr><td>Tenis Branco</td><td>219.90</td></tr></tbody></table>"}, {"label": "CREATE VIEW — relatório de estoque", "narr": "<strong>Docente:</strong> Salvamos a query de relatório como VIEW. Agora é só SELECT * FROM vw_estoque.", "code": "CREATE OR REPLACE VIEW vw_estoque AS\nSELECT\n  c.nome                  AS categoria,\n  COUNT(p.id_produto)     AS qtd,\n  SUM(p.estoque)          AS estoque_total,\n  ROUND(AVG(p.preco), 2) AS preco_medio\nFROM categoria c\nINNER JOIN produto p\n  ON c.id_categoria = p.id_categoria\nGROUP BY c.nome;\n\nSELECT * FROM vw_estoque;", "prev": "<table class='rtbl'><thead><tr><th>categoria</th><th>qtd</th><th>estoque_total</th><th>preco_medio</th></tr></thead><tbody><tr><td>Roupas</td><td>2</td><td>145</td><td>89.90</td></tr><tr><td>Calcados</td><td>1</td><td>30</td><td>219.90</td></tr></tbody></table>"}, {"label": "CASE WHEN — lógica condicional", "narr": "<strong>Docente:</strong> CASE WHEN é como um IF/ELSE dentro do SELECT. Classifica produtos por faixa de preço.", "code": "SELECT\n  nome,\n  preco,\n  CASE\n    WHEN preco < 60  THEN 'Barato'\n    WHEN preco < 150 THEN 'Moderado'\n    ELSE                  'Premium'\n  END AS faixa\nFROM produto\nORDER BY preco;", "prev": "<table class='rtbl'><thead><tr><th>nome</th><th>preco</th><th>faixa</th></tr></thead><tbody><tr><td>Camiseta Azul</td><td>54.90</td><td>Barato</td></tr><tr><td>Calca Jeans</td><td>129.90</td><td>Moderado</td></tr><tr><td>Tenis Branco</td><td>219.90</td><td>Premium</td></tr></tbody></table>"}];
+
+let cur=0,typing=false,typeTimer=null;
+function render(){
+  var s=STEPS[cur];
+  document.getElementById('sbadge').textContent='Etapa '+(cur+1)+' / '+STEPS.length;
+  document.getElementById('sdesc').textContent=s.label;
+  document.getElementById('prog-fill').style.width=Math.round(((cur+1)/STEPS.length)*100)+'%';
+  document.getElementById('bp').disabled=(cur===0);
+  document.getElementById('bn').disabled=(cur===STEPS.length-1);
+  document.getElementById('narr').innerHTML=s.narr;
+  document.getElementById('preview').innerHTML=s.prev||'';
+}
+function playS(){
+  if(typing)return;
+  typing=true;
+  var s=STEPS[cur];
+  var out=document.getElementById('code-out');
+  out.innerHTML='';
+  document.getElementById('bplay').disabled=true;
+  document.getElementById('bp').disabled=true;
+  document.getElementById('bn').disabled=true;
+  var full=s.code;
+  var parts=[];
+  var i=0;
+  while(i<full.length){
+    if(full[i]==='<'){
+      var end=full.indexOf('>',i);
+      if(end!==-1){parts.push({type:'tag',val:full.slice(i,end+1)});i=end+1;continue;}
+    }
+    parts.push({type:'char',val:full[i]});i++;
+  }
+  var pi=0;
+  function tick(){
+    if(pi>=parts.length){
+      typing=false;
+      document.getElementById('bplay').textContent='Rever';
+      document.getElementById('bplay').disabled=false;
+      document.getElementById('bn').disabled=(cur===STEPS.length-1);
+      document.getElementById('bp').disabled=false;
+      return;
+    }
+    var p=parts[pi];
+    if(p.type==='tag'){out.innerHTML+=p.val;pi++;tick();return;}
+    out.innerHTML+=p.val;pi++;
+    typeTimer=setTimeout(tick,p.val==='\n'?55:p.val===' '?18:Math.random()*20+16);
+  }
+  tick();
+}
+function nextS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.min(cur+1,STEPS.length-1);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+function prevS(){
+  if(typing){clearTimeout(typeTimer);typing=false;}
+  cur=Math.max(cur-1,0);
+  render();
+  document.getElementById('code-out').innerHTML=STEPS[cur].code;
+  document.getElementById('bplay').textContent='Rever';
+  document.getElementById('bplay').disabled=false;
+}
+render();
+document.getElementById('code-out').innerHTML='';
+
+</script>
+</body></html>

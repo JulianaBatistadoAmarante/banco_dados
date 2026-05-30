@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Desafio &mdash; Banco loja do zero — DER ao SQL</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ac:#15803d;--lt:#86efac;--bg:#f0fdf4;--dark:#14532d}
+body{font-family:system-ui,sans-serif;color:#1e293b;background:#f8fafc;min-height:100vh;padding:22px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.badge{background:#15803d;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pg-title{font-size:17px;font-weight:600}.pg-meta{font-size:12px;color:#64748b;margin-top:2px}
+.pg-time{font-size:12px;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 12px;border-radius:8px;color:#64748b}
+.next-a{font-size:12px;font-weight:600;background:#fff;border:1.5px solid #15803d;color:#15803d;padding:5px 13px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none}
+.next-a:hover{background:#f0fdf4}
+.prog-row{display:flex;align-items:center;gap:9px}
+.pb{flex:1;height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.pf{height:100%;background:#15803d;border-radius:4px;transition:width .4s;width:0%}
+.pt{font-size:12px;font-weight:600;color:#64748b;min-width:60px;text-align:right}
+.sc{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;transition:border-color .2s}
+.sc.done-c{border-color:#86efac}.sc.open-c{border-color:#86efac}
+.sh{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;cursor:pointer;user-select:none}
+.sh:hover{background:#f8fafc}.sc.open-c .sh{background:#f0fdf4}
+.chk{width:21px;height:21px;border-radius:6px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;cursor:pointer;background:#fff;transition:all .18s}
+.chk:hover{border-color:#15803d;background:#86efac}.chk.done{background:#22c55e;border-color:#22c55e}
+.chk svg{display:none}.chk.done svg{display:block}
+.si{flex:1}.sn2{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.st{font-size:13px;font-weight:600;color:#1e293b}.stm{font-size:11px;color:#94a3b8;margin-top:2px}
+.cv{color:#94a3b8;font-size:11px;margin-top:4px;transition:transform .22s;flex-shrink:0}
+.sc.open-c .cv{transform:rotate(180deg)}
+.sb{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.sc.open-c .sb{max-height:3000px}
+.sbi{padding:0 13px 14px;border-top:1px solid #f1f5f9}
+.il{display:flex;flex-direction:column;gap:6px;margin:11px 0}
+.ii{display:flex;gap:9px;font-size:13px;color:#475569;line-height:1.55;align-items:flex-start}
+.in{width:19px;height:19px;min-width:19px;border-radius:5px;background:#86efac;color:#15803d;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.gab-wrap{margin:10px 0}
+.gab-btn{display:inline-flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.gab-btn:hover{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.gab-btn .arr{transition:transform .2s;display:inline-block}
+.gab-btn.open .arr{transform:rotate(180deg)}
+.gab-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.gab-body.open{max-height:2000px}
+.cw{border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin:7px 0}
+.ch2{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:6px 12px;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:500;color:#64748b}
+.cdd{display:flex;gap:4px}.c1{width:9px;height:9px;border-radius:50%}
+pre{background:#1e293b;color:#e2e8f0;padding:12px 15px;font-size:11.5px;line-height:1.8;overflow-x:auto;font-family:'Courier New',monospace;white-space:pre;margin:0}
+.tip{background:#f0fdf4;border-left:3px solid #15803d;padding:8px 12px;font-size:12px;color:#14532d;line-height:1.5;margin-top:8px}
+.tip strong{color:#15803d}
+.mb{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #cbd5e1;color:#64748b;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;margin-top:10px}
+.mb:hover{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.mb.done-btn{background:#f0fdf4;color:#15803d;border-color:#86efac;pointer-events:none}
+.success-b{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center;display:none}
+.success-b.show{display:block}
+.success-b h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.next-big{display:inline-flex;align-items:center;gap:7px;background:#15803d;color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px}
+.brief{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.bt{background:#dcfce7;padding:17px 19px;border-bottom:1px solid #86efac}
+.bbadge{font-size:11px;font-weight:600;background:#fff;color:#15803d;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:7px}
+.btitle{font-size:19px;font-weight:600;color:#14532d;margin-bottom:3px}
+.bb{padding:15px 19px}
+.ctx{background:#f0fdf4;border-radius:8px;padding:11px 13px;font-size:13px;color:#475569;line-height:1.6;margin-bottom:13px;border-left:3px solid #15803d}
+.ctx strong{color:#1e293b;font-weight:600;display:block;margin-bottom:3px}
+.cl{display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:flex-start;gap:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;color:#475569;line-height:1.5}
+.cd{width:5px;height:5px;min-width:5px;border-radius:50%;background:#15803d;flex-shrink:0;margin-top:5px}
+.tr{display:flex;align-items:center;gap:9px;border:1px solid #e2e8f0;border-radius:12px;padding:11px 15px;background:#fff;flex-wrap:wrap}
+.tn{font-size:26px;font-weight:500;font-family:'Courier New',monospace;color:#1e293b;min-width:80px}
+.ti{flex:1;min-width:130px}.ti p{font-size:12px;color:#64748b;margin-top:1px}
+.ti strong{font-size:13px;color:#1e293b;font-weight:600}
+.tb{font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #cbd5e1;background:#15803d;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.tb.reset{background:#fff;color:#64748b;border-color:#cbd5e1}.tb:disabled{opacity:.4;pointer-events:none}
+.ri2{display:flex;gap:9px;align-items:flex-start;margin-bottom:5px}
+.rc{width:19px;height:19px;min-width:19px;border-radius:5px;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;background:#fff;transition:all .15s;flex-shrink:0}
+.rc:hover{border-color:#15803d;background:#86efac}.rc.on{background:#22c55e;border-color:#22c55e}
+.rc svg{display:none}.rc.on svg{display:block}
+.rt{font-size:12.5px;color:#475569;line-height:1.5}.rt.done{color:#94a3b8;text-decoration:line-through}
+.pbarw{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:9px}
+.sb2{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:18px;text-align:center}
+.sb2.show{display:block}.sb2 h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:5px}
+.sb2 p{font-size:13px;color:#475569}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+/* feedback */
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px}
+.ttitle{font-size:17px;font-weight:600}.tmeta{font-size:12px;color:#64748b;margin-top:1px}
+.chip{font-size:13px;font-weight:500;padding:5px 13px;border-radius:20px;background:#86efac;border:1px solid #86efac;color:#15803d;font-family:'Courier New',monospace}
+.tbtn{font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;cursor:pointer;font-family:inherit;transition:all .15s}
+.tbtn:hover{background:#f1f5f9}.tbtn.act{background:#15803d;color:#fff;border-color:#15803d}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:580px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:11px;text-align:center}
+.sn{font-size:23px;font-weight:500}.sl{font-size:11px;color:#64748b;margin-top:2px}
+.empty-state{background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;color:#94a3b8}
+.empty-state p{font-size:13px;margin-bottom:12px}
+.empty-btn{display:inline-flex;align-items:center;gap:6px;background:#15803d;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:8px}
+.ac{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.ac.pres{border:2px solid #15803d}.ac.conc{border-color:#86efac}
+.at{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #f1f5f9}
+.del-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:15px;line-height:1;padding:2px 5px;border-radius:4px;margin-left:auto;flex-shrink:0;transition:color .15s}
+.del-btn:hover{color:#ef4444}
+.av{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.an{font-size:13px;font-weight:600;line-height:1.2}.as{font-size:11px;color:#94a3b8;margin-top:1px}
+.ab{padding:10px 12px}
+.stars{display:flex;gap:3px;margin-bottom:7px}
+.star{font-size:17px;cursor:pointer;color:#e2e8f0;user-select:none}.star.on{color:#f59e0b}
+.chks{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+.chk2{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
+.mc{width:13px;height:13px;border-radius:3px;border:1px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc.on{background:#22c55e;border-color:#22c55e}.mc svg{display:none}.mc.on svg{display:block}
+.note{width:100%;border:1px solid #e2e8f0;border-radius:5px;padding:5px 7px;font-size:11px;font-family:inherit;color:#1e293b;background:#fff;resize:none;outline:none}
+.note:focus{border-color:#15803d}
+.acts{display:flex;gap:5px;margin-top:7px}
+.act{flex:1;font-size:11px;padding:5px 4px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;font-family:inherit;text-align:center;transition:all .12s}
+.act:hover{background:#86efac;color:#15803d;border-color:#86efac}
+.act.pon{background:#86efac;color:#15803d;border-color:#15803d}
+.act.don{background:#f0fdf4;color:#15803d;border-color:#86efac}
+.col{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.colh{padding:11px 15px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:13px;font-weight:600;color:#475569}
+.colb{padding:13px 15px;display:flex;flex-direction:column;gap:7px}
+.pto{border:1px solid #e2e8f0;border-radius:7px;padding:9px 11px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:9px}
+.pto:hover{border-color:#86efac;background:#f0fdf4}.pto.used{border-color:#86efac;background:#dcfce7}
+.pto-ic{width:23px;height:23px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.pto-tx{font-size:12px;color:#475569;line-height:1.5;flex:1}.pto.used .pto-tx{color:#14532d}
+.pto-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;background:#fef3c7;color:#92400e;white-space:nowrap;flex-shrink:0}
+.pto.used .pto-tag{background:#86efac;color:#15803d}
+.add-area{display:flex;gap:7px;padding:11px 15px;border-top:1px solid #e2e8f0}
+.add-area input{flex:1;border:1px solid #e2e8f0;border-radius:6px;padding:6px 9px;font-size:12px;font-family:inherit;color:#1e293b;background:#fff;outline:none}
+.add-area input:focus{border-color:#15803d}
+.add-area button{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #86efac;background:#86efac;color:#14532d;cursor:pointer;font-family:inherit;font-weight:500}
+.kz-footer{height:32px;background:#1e293b;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:11px}
+.kz-footer a{color:#90caf9;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+.kz-footer a:hover{color:#bbdefb}.kz-footer span{color:#475569;font-size:11px}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="brief">
+    <div class="bt">
+      <div class="bbadge">Desafio aut&#244;nomo &middot; 45 minutos</div>
+      <div class="btitle">Banco loja do zero — DER ao SQL</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:4px">
+        <div style="font-size:13px;color:#15803d">Criar o banco completo sem consultar o roteiro.</div>
+        <a href="a03_feedback.html" style="font-size:12px;font-weight:600;background:#fff;border:1.5px solid #15803d;color:#15803d;padding:5px 13px;border-radius:8px;text-decoration:none">&#128203; Feedback &rarr;</a>
+      </div>
+    </div>
+    <div class="bb">
+      <div class="ctx"><strong>Contexto</strong>Você vai recriar o banco loja do zero em uma query nova, desta vez sem seguir o passo a passo. Tudo que precisar está na sua cabeça e no DER que você desenhou.</div>
+      <div class="two">
+<div><div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em">Tarefas</div><div id="req-list"></div></div>
+<div><div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em">Crit&#233;rios</div>
+<div class="cl">
+<div class="ci"><div class="cd"></div>Banco criado e USE executado</div>
+<div class="ci"><div class="cd"></div>Tabelas na ordem correta (pai antes do filho)</div>
+<div class="ci"><div class="cd"></div>FOREIGN KEY declarada corretamente</div>
+<div class="ci"><div class="cd"></div>INSERTs sem erro de FK</div>
+<div class="ci"><div class="cd"></div>EER gerado bate com o DER da Aula 02</div>
+<div class="ci" style="border-color:#86efac;background:#f0fdf4"><div class="cd" style="background:#22c55e"></div>B&#244;nus: tabela pedido com FK para cliente</div>
+</div></div></div>
+    </div>
+  </div>
+  <div style="border:1px solid #e2e8f0;border-radius:12px;padding:13px 15px;background:#fff">
+    <div style="font-size:12px;color:#64748b;margin-bottom:7px;display:flex;justify-content:space-between"><strong>Progresso</strong><span id="ptxt">0 de 8 conclu&#237;dos</span></div>
+    <div class="pbarw"><div class="pf" id="pfg"></div></div>
+  </div>
+  <div id="req-list" style="display:flex;flex-direction:column;gap:5px"></div>
+  <div class="tr">
+    <div class="tn" id="tnum">45:00</div>
+    <div class="ti"><strong>Cron&#244;metro</strong><p id="tmsg">Inicie quando o docente autorizar</p></div>
+    <button class="tb" id="tbtn" onclick="timerClick()">Iniciar</button>
+    <button class="tb reset" onclick="timerReset()">Zerar</button>
+  </div>
+  <div class="sb2" id="success"><h3>Desafio conclu&#237;do!</h3><p>Mostre ao docente.</p></div>
+</div>
+<div class="kz-footer"><a href="https://instagram.com/karizeviecelli" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@karizeviecelli</a><span>·</span><span>© 2026</span></div>
+<script>const REQS=["CREATE DATABASE loja e USE loja executados sem erro", "Tabela categoria criada com PRIMARY KEY e AUTO_INCREMENT", "Tabela produto criada com FOREIGN KEY referenciando categoria", "Tabela cliente criada com campo email UNIQUE", "INSERTs executados na ordem correta (categoria → produto → cliente)", "SELECT com WHERE e ORDER BY retornando resultados corretos", "EER gerado via Reverse Engineer — diagrama com as 3 tabelas e FK", "ALTER TABLE: nova coluna adicionada sem perder dados existentes"];</script>
+<script>
+const AC_COLOR = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim() || '#1565C0';
+let done=new Set(),ticking=false,tSec=45*60,tIv=null;
+function buildReqs(){
+  const el=document.getElementById('req-list');
+  REQS.forEach((r,i)=>{
+    const d=document.createElement('div');d.className='ri2';
+    d.innerHTML=`<div class="rc" id="rc-${i}" onclick="chk(${i})"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="rt" id="rt-${i}">${r}</div>`;
+    el.appendChild(d);
+  });
+}
+function chk(i){
+  if(done.has(i)){done.delete(i);document.getElementById('rc-'+i).classList.remove('on');document.getElementById('rt-'+i).classList.remove('done');}
+  else{done.add(i);document.getElementById('rc-'+i).classList.add('on');document.getElementById('rt-'+i).classList.add('done');}
+  const n=done.size;
+  document.getElementById('pfg').style.width=Math.round((n/REQS.length)*100)+'%';
+  document.getElementById('ptxt').textContent=n+' de '+REQS.length+' conclu&#237;dos';
+  if(n===REQS.length)document.getElementById('success').classList.add('show');
+  else document.getElementById('success').classList.remove('show');
+}
+function timerClick(){
+  const btn=document.getElementById('tbtn');
+  if(!ticking){
+    ticking=true;btn.textContent='Pausar';btn.style.background='#475569';
+    tIv=setInterval(()=>{
+      tSec--;
+      if(tSec<=0){tSec=0;clearInterval(tIv);ticking=false;btn.textContent='Encerrado';btn.disabled=true;}
+      const m=Math.floor(tSec/60),s=tSec%60;
+      document.getElementById('tnum').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    },1000);
+  } else {
+    ticking=false;clearInterval(tIv);btn.textContent='Continuar';btn.style.background='';
+  }
+}
+function timerReset(){
+  clearInterval(tIv);ticking=false;tSec=45*60;
+  document.getElementById('tnum').textContent='45:00';
+  const btn=document.getElementById('tbtn');btn.textContent='Iniciar';btn.style.background='';btn.disabled=false;
+}
+buildReqs();
+</script>
+</body></html>
