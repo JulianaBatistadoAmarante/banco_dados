@@ -1,40 +1,81 @@
-
-# Aula 02 - Modelagem de Dados e MER
+# Aula 02 – Modelagem de Dados e MER
 
 ## Objetivos
 
-- Compreender entidades e atributos.
-- Criar Diagramas Entidade Relacionamento.
-- Identificar cardinalidades.
+Ao final desta aula você será capaz de:
+
+- Compreender a importância da modelagem de dados.
+- Identificar entidades, atributos e relacionamentos.
+- Construir Diagramas Entidade-Relacionamento (MER).
+- Aplicar cardinalidades corretamente.
+- Entender o processo de levantamento de requisitos.
 
 ---
 
-# O que é Modelagem?
+# Por que modelar antes de criar?
 
-Antes de construir uma casa fazemos a planta.
+Imagine que você deseja construir uma casa.
 
-Antes de criar um banco fazemos a modelagem.
+Você começaria levantando as paredes sem uma planta?
 
----
+Provavelmente não.
 
-# Analogia
+No desenvolvimento de software acontece exatamente a mesma coisa.
 
-Banco de Dados = Casa
-
-Modelagem = Planta da Casa
+Antes de criar tabelas precisamos planejar como os dados serão armazenados.
 
 ---
 
-# Entidade
+# Analogia: Planta da Casa
 
-É algo que desejamos armazenar.
+Casa → Banco de Dados
+
+Planta → MER
+
+Engenheiro → Analista de Sistemas
+
+Pedreiro → Desenvolvedor
+
+---
+
+# O que é Modelagem de Dados?
+
+É o processo de representar visualmente as informações que serão armazenadas pelo sistema.
+
+Objetivos:
+
+- Evitar erros futuros
+- Organizar os dados
+- Facilitar manutenção
+- Reduzir redundâncias
+
+---
+
+# O que é uma Entidade?
+
+Uma entidade é algo que existe no mundo real e que desejamos armazenar.
 
 Exemplos:
 
-- Cliente
-- Produto
-- Curso
+- Aluno
 - Professor
+- Produto
+- Cliente
+- Pedido
+
+---
+
+# O que NÃO é uma entidade?
+
+Características de algo.
+
+Exemplo:
+
+Cliente
+
+Nome NÃO é entidade.
+
+Nome é atributo.
 
 ---
 
@@ -47,14 +88,59 @@ CLIENTE
 - id_cliente
 - nome
 - telefone
+- email
+
+---
+
+# Tipos de Atributos
+
+## Simples
+
+Nome
+
+CPF
+
+Idade
+
+---
+
+## Compostos
+
+Endereço
+
+Pode ser dividido em:
+
+- Rua
+- Número
+- Bairro
+
+---
+
+# Chave Primária
+
+É o identificador único.
+
+Exemplo:
+
+```text
+id_cliente
+```
+
+Não pode repetir.
 
 ---
 
 # Relacionamentos
 
+Representam interações entre entidades.
+
+Exemplo:
+
 CLIENTE faz PEDIDO
 
-ALUNO faz MATRÍCULA
+ALUNO realiza MATRÍCULA
+
+PROFESSOR ministra DISCIPLINA
 
 ---
 
@@ -62,15 +148,19 @@ ALUNO faz MATRÍCULA
 
 ## Um para Um (1:1)
 
-Pessoa → CPF
+Pessoa ↔ CPF
+
+Cada pessoa possui apenas um CPF.
 
 ---
 
 ## Um para Muitos (1:N)
 
-Professor → Turmas
+Professor → Turma
 
-Um professor possui várias turmas.
+Um professor pode ministrar várias turmas.
+
+Cada turma possui apenas um professor responsável.
 
 ---
 
@@ -78,44 +168,84 @@ Um professor possui várias turmas.
 
 Aluno ↔ Curso
 
-Um aluno pode fazer vários cursos.
+Um aluno pode cursar vários cursos.
 
 Um curso possui vários alunos.
 
 ---
 
-# Exemplo MER
+# Problema do N:N
+
+Banco relacional não implementa diretamente.
+
+Precisamos criar uma tabela intermediária.
 
 Aluno
+
+Curso
+
+↓
+
+Matricula
+
+---
+
+# Exemplo Completo
+
+ALUNO
 
 - id_aluno
 - nome
 
-Curso
+CURSO
 
 - id_curso
 - nome
 
-Aluno ---- Matrícula ---- Curso
+MATRICULA
+
+- id_aluno
+- id_curso
+
+---
+
+# Etapas da Modelagem
+
+1. Levantar requisitos
+2. Identificar entidades
+3. Identificar atributos
+4. Identificar relacionamentos
+5. Definir cardinalidades
+6. Criar MER
+
+---
+
+# Erros Comuns
+
+❌ Criar entidade para tudo
+
+❌ Não identificar cardinalidades
+
+❌ Duplicar informações
+
+❌ Esquecer chave primária
 
 ---
 
 # Exercícios
 
-1. O que é uma entidade?
-2. O que é um atributo?
-3. Explique 1:N.
-4. Explique N:N.
+1. Identifique entidades para um sistema hospitalar.
+2. Defina atributos para Médico.
+3. Defina cardinalidades entre Paciente e Consulta.
 
 ---
 
 # Desafio
 
-Crie o MER de uma biblioteca.
+Modele um sistema para uma loja virtual contendo:
 
-Entidades:
-
-- Livro
-- Autor
-- Usuário
-- Empréstimo
+- Cliente
+- Produto
+- Pedido
+- Pagamento
+- Entrega
