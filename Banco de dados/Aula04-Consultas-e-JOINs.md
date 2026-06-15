@@ -1,17 +1,27 @@
-
-# Aula 04 - Consultas SQL e JOINs
+# Aula 04 – Consultas e Relacionamentos
 
 ## Objetivos
 
-- Realizar consultas.
-- Utilizar filtros.
-- Trabalhar com JOIN.
+- Consultar informações.
+- Filtrar registros.
+- Ordenar resultados.
+- Utilizar JOINs.
 
 ---
 
-# Filtros
+# SELECT
 
-## WHERE
+Recupera informações.
+
+```sql
+SELECT * FROM aluno;
+```
+
+---
+
+# WHERE
+
+Filtra dados.
 
 ```sql
 SELECT *
@@ -21,7 +31,37 @@ WHERE idade >= 18;
 
 ---
 
-# Ordenação
+# Operadores
+
+=
+
+>
+
+<
+
+>=
+
+<=
+
+<>
+
+---
+
+# LIKE
+
+Busca textual.
+
+```sql
+SELECT *
+FROM aluno
+WHERE nome LIKE 'A%';
+```
+
+Começa com A.
+
+---
+
+# ORDER BY
 
 ```sql
 SELECT *
@@ -31,7 +71,7 @@ ORDER BY nome;
 
 ---
 
-# Contagem
+# COUNT
 
 ```sql
 SELECT COUNT(*)
@@ -40,31 +80,43 @@ FROM aluno;
 
 ---
 
+# SUM
+
+```sql
+SELECT SUM(valor)
+FROM pedido;
+```
+
+---
+
+# AVG
+
+```sql
+SELECT AVG(valor)
+FROM pedido;
+```
+
+---
+
 # Analogia para JOIN
 
-Imagine duas listas:
+Imagine duas planilhas.
 
-Lista 1
+Planilha Clientes.
 
-| id | nome |
-|----|------|
-| 1 | Ana |
+Planilha Pedidos.
 
-Lista 2
-
-| id_cliente | pedido |
-|------------|---------|
-| 1 | 101 |
-
-O JOIN conecta as informações pelo id.
+O JOIN é a "cola" que une as informações.
 
 ---
 
 # INNER JOIN
 
+Retorna apenas correspondências.
+
 ```sql
 SELECT c.nome,
-       p.id_pedido
+       p.valor
 FROM cliente c
 INNER JOIN pedido p
 ON c.id_cliente = p.id_cliente;
@@ -73,6 +125,8 @@ ON c.id_cliente = p.id_cliente;
 ---
 
 # LEFT JOIN
+
+Retorna todos da esquerda.
 
 ```sql
 SELECT *
@@ -83,59 +137,29 @@ ON c.id_cliente = p.id_cliente;
 
 ---
 
+# RIGHT JOIN
+
+Retorna todos da direita.
+
+---
+
 # SELF JOIN
 
-```sql
-SELECT
- f.nome,
- g.nome
-FROM funcionario f
-LEFT JOIN funcionario g
-ON f.gerente_id = g.id;
-```
+Tabela relacionada com ela mesma.
 
----
-
-# Limpeza de Dados
-
-## DELETE
-
-```sql
-DELETE FROM aluno;
-```
-
----
-
-## TRUNCATE
-
-```sql
-TRUNCATE TABLE aluno;
-```
-
----
-
-## Reiniciar Auto Increment
-
-```sql
-ALTER TABLE aluno
-AUTO_INCREMENT = 1;
-```
+Funcionário → Gerente
 
 ---
 
 # Exercícios
 
-1. Faça um SELECT com WHERE.
-2. Faça um ORDER BY.
-3. Faça um INNER JOIN.
-4. Faça um LEFT JOIN.
+1. Filtre alunos maiores de idade.
+2. Faça ordenação por nome.
+3. Conte registros.
+4. Crie JOIN entre Cliente e Pedido.
 
 ---
 
 # Desafio
 
-Monte um banco de Loja Virtual e realize JOINs entre:
-
-- Cliente
-- Pedido
-- Produto
+Montar consultas para sistema de biblioteca.
