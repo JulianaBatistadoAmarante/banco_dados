@@ -1,11 +1,11 @@
-
-# Aula 03 - SQL Básico (DDL e DML)
+# Aula 03 – SQL: Criando e Manipulando Dados
 
 ## Objetivos
 
+- Compreender a linguagem SQL.
 - Criar tabelas.
-- Inserir dados.
-- Atualizar registros.
+- Inserir registros.
+- Atualizar dados.
 - Excluir registros.
 
 ---
@@ -16,17 +16,69 @@ SQL significa:
 
 Structured Query Language
 
-Linguagem utilizada para conversar com o banco de dados.
+Linguagem padrão para comunicação com bancos relacionais.
+
+---
+
+# Analogia
+
+Imagine um garçom.
+
+Você faz um pedido.
+
+O garçom leva à cozinha.
+
+A cozinha retorna o resultado.
+
+No banco:
+
+Usuário → SQL → Banco
+
+---
+
+# Categorias SQL
+
+DDL
+
+Criação da estrutura.
+
+DML
+
+Manipulação dos dados.
+
+DQL
+
+Consultas.
+
+DCL
+
+Permissões.
+
+TCL
+
+Transações.
 
 ---
 
 # DDL
 
-Data Definition Language
+## CREATE DATABASE
 
-Define estruturas.
+```sql
+CREATE DATABASE escola;
+```
 
-## CREATE
+---
+
+## USE
+
+```sql
+USE escola;
+```
+
+---
+
+## CREATE TABLE
 
 ```sql
 CREATE TABLE aluno(
@@ -36,45 +88,68 @@ CREATE TABLE aluno(
 );
 ```
 
-## ALTER
+---
 
-```sql
-ALTER TABLE aluno
-ADD cidade VARCHAR(100);
-```
+# Tipos de Dados
 
-## DROP
+INT
 
-```sql
-DROP TABLE aluno;
-```
+VARCHAR
+
+DATE
+
+DECIMAL
+
+BOOLEAN
 
 ---
 
 # DML
 
-Manipula dados.
-
 ## INSERT
 
 ```sql
 INSERT INTO aluno
-VALUES(1,'Ana',17);
+VALUES
+(1,'Ana',17);
 ```
 
-## SELECT
+---
+
+## INSERT múltiplo
 
 ```sql
-SELECT * FROM aluno;
+INSERT INTO aluno
+VALUES
+(1,'Ana',17),
+(2,'João',18),
+(3,'Maria',19);
 ```
+
+---
 
 ## UPDATE
 
 ```sql
 UPDATE aluno
-SET idade = 18
+SET idade = 20
 WHERE id = 1;
 ```
+
+---
+
+# Atenção
+
+Sem WHERE:
+
+```sql
+UPDATE aluno
+SET idade = 20;
+```
+
+Atualiza TODOS.
+
+---
 
 ## DELETE
 
@@ -85,32 +160,55 @@ WHERE id = 1;
 
 ---
 
-# Analogia
+# TRUNCATE
 
-Tabela = Planilha Excel
+```sql
+TRUNCATE TABLE aluno;
+```
 
-INSERT = Adicionar linha
+Diferença:
 
-UPDATE = Editar linha
+DELETE → linha por linha
 
-DELETE = Apagar linha
+TRUNCATE → limpa tudo rapidamente
+
+---
+
+# AUTO_INCREMENT
+
+```sql
+CREATE TABLE aluno(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ nome VARCHAR(100)
+);
+```
+
+---
+
+# Reiniciando contador
+
+```sql
+ALTER TABLE aluno
+AUTO_INCREMENT = 1;
+```
 
 ---
 
 # Exercícios
 
-1. Crie uma tabela Produto.
-2. Insira 3 produtos.
-3. Atualize um preço.
-4. Exclua um produto.
+1. Crie tabela Produto.
+2. Insira 5 registros.
+3. Atualize preços.
+4. Apague um produto.
 
 ---
 
 # Desafio
 
-Criar uma tabela Funcionário com:
+Criar banco para academia.
 
-- id
-- nome
-- salário
-- setor
+Tabelas:
+
+- Aluno
+- Plano
+- Professor
