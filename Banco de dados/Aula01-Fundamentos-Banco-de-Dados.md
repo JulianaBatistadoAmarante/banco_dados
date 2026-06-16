@@ -479,7 +479,7 @@ Grandes empresas de tecnologia armazenam volumes gigantescos de dados.
 - Instagram: bilhões de fotos, vídeos e interações.
 - Netflix: histórico de visualizações, recomendações e preferências dos usuários.
 - Amazon: produtos, pedidos, avaliações e informações logísticas.
-
+---
 Para suportar essa quantidade de informações, essas empresas utilizam milhares de servidores distribuídos em datacenters ao redor do mundo e combinam diferentes tecnologias de armazenamento de dados.
 ---
 
