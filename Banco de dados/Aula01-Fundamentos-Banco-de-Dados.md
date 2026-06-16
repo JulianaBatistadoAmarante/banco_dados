@@ -4,81 +4,92 @@
 
 Ao final desta aula você será capaz de:
 
-- Entender a importância dos bancos de dados nos sistemas modernos.
+- Entender o que é um banco de dados.
 - Diferenciar dados, informação e conhecimento.
 - Compreender o conceito de persistência de dados.
-- Identificar tabelas, registros e atributos.
-- Entender o funcionamento básico de um SGBD.
+- Identificar os componentes básicos de um banco de dados.
+- Entender o papel de um SGBD.
+- Reconhecer situações onde o uso de banco de dados é necessário.
 
 ---
 
 # Introdução
 
-Você já se perguntou onde ficam armazenadas as mensagens do WhatsApp?
+Atualmente utilizamos sistemas digitais praticamente o tempo todo.
 
-E as músicas do Spotify?
+Quando você:
 
-E os vídeos curtidos no YouTube?
+- envia uma mensagem no WhatsApp;
+- assiste um vídeo no YouTube;
+- faz uma compra online;
+- acessa o Instagram;
+- consulta notas escolares;
 
-Todos esses sistemas armazenam milhões ou até bilhões de informações diariamente.
+está utilizando um banco de dados.
 
-Essas informações precisam ser:
+Mas afinal...
 
-- organizadas
-- protegidas
-- atualizadas
-- recuperadas rapidamente
+## O que é um banco de dados?
 
-É justamente para isso que existem os Bancos de Dados.
+Um banco de dados é uma coleção organizada de informações armazenadas eletronicamente, permitindo que os dados sejam consultados, alterados e protegidos de forma eficiente.
 
 ---
 
-# O Problema do Armazenamento
+# O Problema Antes dos Bancos de Dados
 
-Imagine uma escola com:
+Imagine uma escola que possui:
 
 - 2.000 alunos
-- 150 professores
+- 120 professores
 - 80 turmas
 
-Agora imagine controlar tudo em papel.
+Todas as informações são armazenadas em fichas de papel.
 
-Problemas:
+### Problemas:
 
-- perda de documentos
-- dificuldade de consulta
-- duplicidade de informações
-- erros de preenchimento
+- documentos perdidos;
+- dificuldade para localizar informações;
+- informações duplicadas;
+- erros de preenchimento;
+- demora para gerar relatórios.
 
-O banco de dados surgiu para resolver esse problema.
+Agora imagine procurar a ficha de um aluno específico entre milhares de papéis.
+
+Seria extremamente trabalhoso.
+
+Foi para resolver problemas como esse que surgiram os bancos de dados.
 
 ---
 
-# Dados x Informação x Conhecimento
+# Dados, Informação e Conhecimento
+
+Esses conceitos são frequentemente confundidos.
+
+---
 
 ## Dados
 
-São valores isolados.
+Dados são fatos isolados.
 
 Exemplos:
 
 ```text
-Karize
-53
+João
+18
 Blumenau
 ```
 
-Sozinhos não possuem significado completo.
+Separadamente eles possuem pouco significado.
 
 ---
 
 ## Informação
 
-Dados organizados.
+Informação é o resultado da organização dos dados.
 
 | Nome | Idade | Cidade |
 |--------|--------|---------|
-| Karize | 53 | Blumenau |
+| João | 18 | Blumenau |
 
 Agora conseguimos interpretar os dados.
 
@@ -86,40 +97,47 @@ Agora conseguimos interpretar os dados.
 
 ## Conhecimento
 
-É a capacidade de tomar decisões utilizando a informação.
+Conhecimento é a capacidade de tomar decisões utilizando informações.
 
 Exemplo:
 
-"A maioria dos alunos que faltam mais de 25% das aulas acaba reprovando."
+Após analisar os dados de frequência dos alunos, a escola percebe que estudantes com mais de 25% de faltas possuem maior chance de reprovação.
+
+Isso já é conhecimento.
 
 ---
 
 # Analogia: Biblioteca
 
-Imagine uma biblioteca.
+Uma das analogias mais utilizadas para explicar bancos de dados é a biblioteca.
 
-A biblioteca inteira representa o Banco de Dados.
-
-As estantes representam as Tabelas.
-
-Os livros representam os Registros.
-
-As informações da capa representam os Campos.
+Imagine uma biblioteca física.
 
 | Biblioteca | Banco de Dados |
 |------------|---------------|
+| Biblioteca | Banco de Dados |
 | Estante | Tabela |
 | Livro | Registro |
-| Título do livro | Campo |
-| Biblioteca inteira | Banco |
+| Informação do livro | Campo |
+| Bibliotecário | SGBD |
 
 ---
 
-# O que é um Banco de Dados?
+# O que é Persistência de Dados?
 
-Definição:
+Persistência significa que os dados continuam existindo mesmo após o sistema ser desligado.
 
-Coleção organizada de informações que podem ser armazenadas, recuperadas e manipuladas eletronicamente.
+Exemplo:
+
+Você envia uma mensagem no WhatsApp.
+
+Desliga o celular.
+
+Liga novamente.
+
+A mensagem continua lá.
+
+Isso ocorre porque ela foi persistida em um banco de dados.
 
 ---
 
@@ -127,17 +145,9 @@ Coleção organizada de informações que podem ser armazenadas, recuperadas e m
 
 SGBD significa:
 
-Sistema Gerenciador de Banco de Dados.
+**Sistema Gerenciador de Banco de Dados**
 
-É o software responsável por controlar o banco.
-
-Exemplos de SGBDs:
-
-- MySQL
-- PostgreSQL
-- SQL Server
-- Oracle
-- MariaDB
+É o software responsável por gerenciar os dados armazenados.
 
 ---
 
@@ -147,17 +157,108 @@ Imagine um restaurante.
 
 O cliente faz um pedido.
 
-O garçom leva o pedido para a cozinha.
+O garçom leva o pedido até a cozinha.
 
-A cozinha prepara a refeição.
+A cozinha prepara o prato.
 
-O garçom entrega ao cliente.
+O garçom retorna com o resultado.
 
-No banco:
+No banco de dados:
 
-Usuário → Sistema → SGBD → Banco de Dados
+```text
+Usuário
+   ↓
+Sistema
+   ↓
+SGBD
+   ↓
+Banco de Dados
+```
 
 O SGBD funciona como o garçom.
+
+---
+
+# Principais SGBDs do Mercado
+
+## MySQL
+
+Muito utilizado em aplicações web.
+
+Exemplos:
+
+- WordPress
+- PHP
+- Laravel
+
+---
+
+## PostgreSQL
+
+Conhecido pela robustez e aderência aos padrões SQL.
+
+Muito utilizado em:
+
+- Sistemas corporativos
+- Governo
+- Universidades
+
+---
+
+## SQL Server
+
+Desenvolvido pela
+:contentReference[oaicite:0]{index=0}.
+
+Muito utilizado em ambientes empresariais.
+
+---
+
+## Oracle Database
+
+Desenvolvido pela
+:contentReference[oaicite:1]{index=1}.
+
+Amplamente utilizado por grandes empresas.
+
+---
+
+## MariaDB
+
+Projeto derivado do MySQL.
+
+Código aberto e amplamente utilizado.
+
+---
+
+# Estrutura de um Banco de Dados
+
+Vamos imaginar um sistema escolar.
+
+---
+
+## Banco de Dados
+
+```text
+Escola
+```
+
+Dentro dele teremos várias tabelas.
+
+---
+
+## Tabela
+
+Representa um conjunto de informações relacionadas.
+
+Exemplos:
+
+```text
+Aluno
+Professor
+Curso
+Turma
+```
 
 ---
 
@@ -175,7 +276,9 @@ Tabela ALUNO
 
 # Campos (Colunas)
 
-Representam características.
+São as características armazenadas.
+
+Na tabela ALUNO:
 
 ```text
 id
@@ -183,45 +286,63 @@ nome
 idade
 ```
 
-Cada coluna possui um tipo de dado.
+Cada campo possui um tipo de dado.
 
 ---
 
 # Registros (Linhas)
 
-Representam uma ocorrência.
+Representam ocorrências reais.
+
+Exemplo:
 
 ```text
 1 | Ana | 17
 ```
 
-Cada linha representa um aluno.
+Cada linha corresponde a um aluno.
 
 ---
 
 # Tipos de Dados
 
-## Inteiro
+Os bancos de dados trabalham com diferentes tipos de informação.
+
+---
+
+## INT
+
+Armazena números inteiros.
+
+Exemplos:
 
 ```text
+1
 10
-25
-300
+500
 ```
 
 ---
 
-## Texto
+## VARCHAR
+
+Armazena textos.
+
+Exemplos:
 
 ```text
 Ana
-Carlos
+João
 Maria
 ```
 
 ---
 
-## Data
+## DATE
+
+Armazena datas.
+
+Exemplo:
 
 ```text
 2026-06-15
@@ -229,96 +350,214 @@ Maria
 
 ---
 
-## Decimal
+## DECIMAL
+
+Armazena valores monetários.
+
+Exemplo:
 
 ```text
-10.50
-25.99
+199.99
 ```
 
 ---
 
-# Boas Práticas
+## BOOLEAN
 
-✔ Cada tabela deve representar apenas um assunto.
+Armazena verdadeiro ou falso.
 
-✔ Evitar repetir informações.
-
-✔ Definir nomes claros.
-
-✔ Utilizar identificadores únicos.
-
----
-
-# Erros Comuns
-
-❌ Colocar telefone1, telefone2, telefone3
-
-❌ Misturar informações de alunos e professores na mesma tabela
-
-❌ Não utilizar identificador único
+```text
+TRUE
+FALSE
+```
 
 ---
 
-# Onde os Bancos de Dados são Utilizados?
+# O Problema da Duplicação de Dados
+
+Imagine a seguinte tabela:
+
+| Nome | Curso |
+|--------|--------|
+| Ana | Java |
+| Ana | Python |
+| Ana | Banco de Dados |
+
+O nome da Ana aparece repetidamente.
+
+Isso gera:
+
+- desperdício de espaço;
+- maior chance de erros;
+- dificuldade de manutenção.
+
+Nas próximas aulas veremos como a modelagem resolve esse problema.
+
+---
+
+# Integridade dos Dados
+
+Integridade significa garantir que os dados sejam corretos.
+
+Exemplo:
+
+Uma matrícula não pode existir para um aluno inexistente.
+
+Um pedido não pode pertencer a um cliente que não existe.
+
+O banco de dados ajuda a garantir essas regras.
+
+---
+
+# Segurança dos Dados
+
+Os bancos modernos oferecem:
+
+- autenticação de usuários;
+- permissões de acesso;
+- criptografia;
+- backups.
+
+Exemplo:
+
+Um professor pode visualizar notas.
+
+Mas talvez não possa alterar informações financeiras da instituição.
+
+---
+
+# Backup
+
+Backup é uma cópia de segurança dos dados.
+
+Imagine que o servidor da empresa apresente um problema.
+
+Sem backup:
+
+❌ perda total das informações
+
+Com backup:
+
+✔ recuperação dos dados
+
+---
+
+# Onde os Bancos de Dados São Utilizados?
+
+Praticamente em qualquer sistema.
+
+Exemplos:
 
 - Bancos
 - Hospitais
 - Escolas
-- Redes Sociais
-- Sistemas ERP
-- Aplicativos de Delivery
+- Universidades
+- E-commerce
+- Redes sociais
+- Aplicativos de transporte
 - Streaming
-
-Praticamente qualquer sistema moderno utiliza banco de dados.
 
 ---
 
 # Curiosidade
 
-O Facebook armazena vários petabytes de dados.
+O banco de dados do Instagram armazena bilhões de fotos e vídeos.
 
-1 Petabyte ≈ 1.000 Terabytes.
+Empresas como
+:contentReference[oaicite:2]{index=2},
+:contentReference[oaicite:3]{index=3}
+e
+:contentReference[oaicite:4]{index=4}
+utilizam milhares de servidores para armazenar seus dados.
+
+---
+
+# Resumo da Aula
+
+Aprendemos:
+
+✔ O que é um banco de dados
+
+✔ Diferença entre dados, informação e conhecimento
+
+✔ O que é persistência
+
+✔ O papel do SGBD
+
+✔ Tabelas, campos e registros
+
+✔ Tipos de dados
+
+✔ Segurança e backup
 
 ---
 
 # Exercícios de Fixação
 
-1. Explique a diferença entre dado e informação.
+## Questão 1
 
-2. O que é um SGBD?
+Explique com suas palavras o que é um banco de dados.
 
-3. Cite três exemplos de bancos de dados.
+---
 
-4. Qual a diferença entre campo e registro?
+## Questão 2
 
-5. O que acontece se uma empresa não possuir um banco de dados organizado?
+Qual a diferença entre dado e informação?
+
+---
+
+## Questão 3
+
+O que significa SGBD?
+
+---
+
+## Questão 4
+
+Cite três exemplos de SGBDs.
+
+---
+
+## Questão 5
+
+Qual a função de um backup?
+
+---
+
+## Questão 6
+
+Qual a diferença entre campo e registro?
+
+---
+
+## Questão 7
+
+O que significa persistência de dados?
 
 ---
 
 # Exercício Prático
 
-Modele uma tabela para armazenar:
-
-- Filmes
-- Jogos
-- Livros
-
-Defina:
-
-- Identificador
-- Nome
-- Categoria
-- Ano
-
----
-
-# Desafio
-
-Uma clínica deseja armazenar:
+Uma clínica médica deseja armazenar:
 
 - pacientes
 - médicos
 - consultas
 
-Liste quais tabelas você criaria e quais informações armazenaria em cada uma.
+Identifique:
+
+1. Quais tabelas seriam necessárias?
+2. Quais informações cada tabela deveria armazenar?
+
+---
+
+# Desafio
+
+Analise os sistemas abaixo e descreva quais tipos de informações provavelmente são armazenadas em seus bancos de dados:
+
+- Netflix
+- Spotify
+- WhatsApp
+- Sistema Acadêmico de uma Escola
+
+Justifique sua resposta.
