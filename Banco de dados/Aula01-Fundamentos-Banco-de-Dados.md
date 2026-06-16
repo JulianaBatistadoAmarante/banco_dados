@@ -474,15 +474,13 @@ Exemplos:
 
 # Curiosidade
 
-O banco de dados do Instagram armazena bilhões de fotos e vídeos.
+Grandes empresas de tecnologia armazenam volumes gigantescos de dados.
 
-Empresas como
-:contentReference[oaicite:2]{index=2},
-:contentReference[oaicite:3]{index=3}
-e
-:contentReference[oaicite:4]{index=4}
-utilizam milhares de servidores para armazenar seus dados.
+- Instagram: bilhões de fotos, vídeos e interações.
+- Netflix: histórico de visualizações, recomendações e preferências dos usuários.
+- Amazon: produtos, pedidos, avaliações e informações logísticas.
 
+Para suportar essa quantidade de informações, essas empresas utilizam milhares de servidores distribuídos em datacenters ao redor do mundo e combinam diferentes tecnologias de armazenamento de dados.
 ---
 
 # Resumo da Aula
