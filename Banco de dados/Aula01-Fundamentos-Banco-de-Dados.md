@@ -207,22 +207,35 @@ Muito utilizado em:
 
 ## SQL Server
 
-Desenvolvido pela
-:contentReference[oaicite:0]{index=0}.
+Desenvolvido pela Microsoft.
 
-Muito utilizado em ambientes empresariais.
+É um dos bancos de dados relacionais mais utilizados em empresas de médio e grande porte, especialmente em ambientes corporativos que utilizam tecnologias Microsoft como Windows Server, .NET e Azure.
 
 ---
 
 ## Oracle Database
 
-Desenvolvido pela
-:contentReference[oaicite:1]{index=1}.
+Desenvolvido pela Oracle Corporation.
 
-Amplamente utilizado por grandes empresas.
+É um dos bancos de dados relacionais mais robustos e utilizados no mundo, especialmente em grandes empresas, instituições financeiras, governos e organizações que necessitam de alta disponibilidade e segurança.
 
+Principais características:
+
+- Alto desempenho
+- Suporte a grandes volumes de dados
+- Recursos avançados de segurança
+- Replicação e alta disponibilidade
+- Suporte a ambientes corporativos críticos
+
+Exemplos de utilização:
+
+- Bancos
+- Operadoras de telefonia
+- Governos
+- Grandes indústrias
+- Sistemas ERP corporativos
+- 
 ---
-
 ## MariaDB
 
 Projeto derivado do MySQL.
