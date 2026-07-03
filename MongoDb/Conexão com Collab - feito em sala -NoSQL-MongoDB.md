@@ -12,6 +12,10 @@ Ao final desta aula você será capaz de:
 - Comparar modelagem SQL e NoSQL.
 - Identificar cenários adequados para cada tecnologia.
 
+
+---
+# link Colab 
+https://colab.research.google.com/drive/1DHp85nuCIw9mKWpzkEfA-XZVh84rqYE_?usp=sharing 
 ---
 
 # Introdução
